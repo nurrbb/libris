@@ -17,4 +17,5 @@ public interface AuthorMapper {
 
     @Mapping(target = "books", expression = "java(author.getBooks().stream().map(Book::getTitle).collect(Collectors.toSet()))")
     AuthorResponse toResponse(Author author);
+
 }
