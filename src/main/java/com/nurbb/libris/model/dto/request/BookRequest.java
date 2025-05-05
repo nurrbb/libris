@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -20,7 +19,7 @@ public class BookRequest {
     private String title;
 
     @NotNull
-    private Set<UUID> authorIds; //name?
+    private String authorName;
 
     @NotBlank
     private String isbn;
@@ -33,5 +32,4 @@ public class BookRequest {
 
     @NotNull
     private Integer count;
-
 }
