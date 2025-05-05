@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class Borrow extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -28,10 +29,11 @@ public class Borrow extends BaseEntity {
     @Column(name = "due_date", nullable = false)
     private LocalDate dueDate;
 
+
     @Column(name = "return_date") //getirme tarihi girilecek mi?
     private LocalDate returnDate;
 
     @Column(nullable = false)
-    private Boolean returned = false;
+    private Boolean returned;
 
 }
