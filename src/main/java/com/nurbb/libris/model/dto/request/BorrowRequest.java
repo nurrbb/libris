@@ -17,7 +17,7 @@ public class BorrowRequest {
     private UUID bookId; //name?
 
     @NotNull
-    private UUID userId; //name?
+    private String email;
 
     @NotNull
     private LocalDate borrowDate;
