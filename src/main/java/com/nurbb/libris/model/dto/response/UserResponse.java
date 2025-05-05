@@ -1,16 +1,24 @@
 package com.nurbb.libris.model.dto.response;
 
 import com.nurbb.libris.model.entity.Role;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-public record UserResponse(
-        UUID id,
-        String fullName,
-        String email,
-        String phone,
-        Role role,
-        boolean deleted,
-        String createdAt,
-        String updatedAt
-) {}
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UserResponse {
+    private UUID id;
+    private String fullName;
+    private String email;
+    private String phone;
+    private Role role;
+    private boolean deleted;
+    private String createdAt;
+    private String updatedAt;
+}
