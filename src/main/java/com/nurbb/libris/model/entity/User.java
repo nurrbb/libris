@@ -5,14 +5,12 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
 
 public class User extends BaseEntity {
 
@@ -32,6 +30,29 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+    @Column(nullable = false)
+    private int score = 0;
+
+    @Column(nullable = false)
+    private String level = "Novice";
+
+    @Column(nullable = false)
+    private int totalBorrowedBooks = 0;
+
+    @Column(nullable = false)
+    private int totalReturnedBooks = 0;
+
+    @Column(nullable = false)
+    private int totalLateReturns = 0;
+
+    @Column(nullable = false)
+    private int streakTimelyReturns = 0;
+
+    @Column(nullable = false)
+    private int totalReadingDays = 0;
+
+    @Column(nullable = false)
+    private int totalReadPages = 0;
 
     @Column(nullable = false)
     private Boolean deleted = false;
