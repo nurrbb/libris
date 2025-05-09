@@ -17,7 +17,9 @@ public class BookResponse {
     private LocalDate publishedDate;
     private Genre genre;
     private Integer count;
+    private int pageCount;
     private boolean isAvailable;
+
 
     private String createdAt;
     private String updatedAt;
