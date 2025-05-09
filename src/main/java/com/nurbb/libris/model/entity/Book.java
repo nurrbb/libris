@@ -34,6 +34,9 @@ public class Book extends BaseEntity {
     @Column(name = "count", nullable = false)
     private Integer count;
 
+    @Column(nullable = false)
+    private int pageCount;
+
     @Column(name = "is_available", nullable = false)
     private boolean isAvailable = true;
 
