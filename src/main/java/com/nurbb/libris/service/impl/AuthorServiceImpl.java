@@ -1,15 +1,18 @@
 package com.nurbb.libris.service.impl;
 
+import com.nurbb.libris.exception.InvalidRequestException;
 import com.nurbb.libris.model.entity.Author;
 import com.nurbb.libris.repository.AuthorRepository;
 import com.nurbb.libris.service.AuthorService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthorServiceImpl implements AuthorService {
@@ -20,12 +23,15 @@ public class AuthorServiceImpl implements AuthorService {
     public Author createAuthor(String name) {
         String trimmedName = name.trim();
         if (authorRepository.existsByNameIgnoreCase(trimmedName)) {
-            throw new IllegalArgumentException("Author with name '" + trimmedName + "' already exists.");
+            log.warn("Author creation failed. '{}' already exists.", trimmedName);
+            throw new InvalidRequestException("Author with name '" + trimmedName + "' already exists.");
         }
         Author author = new Author();
         author.setName(trimmedName);
+        log.info("Author '{}' created successfully.", trimmedName);
         return authorRepository.save(author);
     }
+
 
     @Override
     public List<Author> getAllAuthors() {
@@ -49,6 +55,7 @@ public class AuthorServiceImpl implements AuthorService {
                 .orElseGet(() -> {
                     Author author = new Author();
                     author.setName(trimmed);
+                    log.info("Author '{}' not found. Created new author.", trimmed);
                     return authorRepository.save(author);
                 });
     }
