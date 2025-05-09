@@ -1,12 +1,9 @@
 package com.nurbb.libris.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 
