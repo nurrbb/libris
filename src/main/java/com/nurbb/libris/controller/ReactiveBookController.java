@@ -17,6 +17,8 @@ public class ReactiveBookController {
 
     private final BookAvailabilityPublisher availabilityPublisher;
 
+
+
     @GetMapping(value = "/availability/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(
             summary = "Stream real-time book availability updates",
