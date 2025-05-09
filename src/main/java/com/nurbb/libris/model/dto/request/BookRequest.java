@@ -1,6 +1,7 @@
 package com.nurbb.libris.model.dto.request;
 
 import com.nurbb.libris.model.entity.Genre;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,10 @@ public class BookRequest {
 
     @NotNull
     private Genre genre;
+
+    @Min(value = 1, message = "Page count must be at least 1")
+    private int pageCount;
+
 
     @NotNull
     private Integer count;
