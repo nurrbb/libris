@@ -11,6 +11,7 @@ public interface BookMapper {
 
     @Mapping(target = "author", expression = "java(author)")
     @Mapping(target = "isAvailable", ignore = true)
+    @Mapping(target = "pageCount", source = "pageCount") // ✅ pageCount eklendi
     Book toEntity(BookRequest request, @Context Author author);
 
     @AfterMapping
@@ -21,5 +22,6 @@ public interface BookMapper {
     @Mapping(target = "authorName", source = "author.name")
     @Mapping(target = "createdAt", expression = "java(book.getCreatedDate().toString())")
     @Mapping(target = "updatedAt", expression = "java(book.getUpdatedDate().toString())")
+    @Mapping(target = "pageCount", source = "pageCount") // ✅ pageCount eklendi
     BookResponse toResponse(Book book);
 }
