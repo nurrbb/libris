@@ -2,6 +2,7 @@ package com.nurbb.libris.controller;
 
 import com.nurbb.libris.model.dto.request.UserRequest;
 import com.nurbb.libris.model.dto.response.UserResponse;
+import com.nurbb.libris.model.dto.response.UserStatisticsResponse;
 import com.nurbb.libris.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -75,4 +76,15 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{id}/stats")
+    @Operation(summary = "Get user reading statistics", responses = {
+            @ApiResponse(responseCode = "200", description = "Statistics retrieved",
+                    content = @Content(schema = @Schema(implementation = UserStatisticsResponse.class))),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    public ResponseEntity<UserStatisticsResponse> getUserStats(@PathVariable UUID id) {
+        return ResponseEntity.ok(userService.getUserStatistics(id));
+    }
+
 }
