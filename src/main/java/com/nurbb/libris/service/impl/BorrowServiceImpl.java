@@ -4,21 +4,26 @@ import com.nurbb.libris.exception.InvalidRequestException;
 import com.nurbb.libris.exception.NotFoundException;
 import com.nurbb.libris.exception.QuotasFullException;
 import com.nurbb.libris.model.dto.request.BorrowRequest;
+import com.nurbb.libris.model.dto.response.BookAvailabilityResponse;
 import com.nurbb.libris.model.dto.response.BorrowResponse;
 import com.nurbb.libris.model.entity.Book;
 import com.nurbb.libris.model.entity.Borrow;
+import com.nurbb.libris.model.entity.Role;
 import com.nurbb.libris.model.entity.User;
 import com.nurbb.libris.model.mapper.BorrowMapper;
+import com.nurbb.libris.reactive.BookAvailabilityPublisher;
 import com.nurbb.libris.repository.BookRepository;
 import com.nurbb.libris.repository.BorrowRepository;
 import com.nurbb.libris.repository.UserRepository;
 import com.nurbb.libris.service.BorrowService;
+import com.nurbb.libris.util.LevelUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import com.nurbb.libris.util.BookAvailabilityPublisher;
-import com.nurbb.libris.util.LevelUtils;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -52,9 +57,15 @@ public class BorrowServiceImpl implements BorrowService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new NotFoundException("User not found with email: " + request.getEmail()));
 
-        // 🔹 Kullanıcının seviyesi ve max süresi
+        checkUserEligibility(user);
+
         user.setLevel(LevelUtils.determineLevel(user.getScore()));
         int maxAllowedDays = LevelUtils.getMaxTotalBorrowDays(user.getLevel());
+
+        if (request.getDueDate() == null) {
+            int defaultDays = LevelUtils.getDefaultBorrowDays(user.getLevel());
+            request.setDueDate(request.getBorrowDate().plusDays(defaultDays));
+        }
 
         List<Borrow> activeBorrows = borrowRepository.findByUser(user).stream()
                 .filter(b -> !b.getReturned())
@@ -72,7 +83,6 @@ public class BorrowServiceImpl implements BorrowService {
             throw new QuotasFullException("Borrowing this book would exceed your allowed total borrow day limit of " + maxAllowedDays + " days.");
         }
 
-        // 🔹 Borrow kaydı oluşturuluyor
         Borrow borrow = Borrow.builder()
                 .book(book)
                 .user(user)
@@ -81,16 +91,21 @@ public class BorrowServiceImpl implements BorrowService {
                 .returned(false)
                 .build();
 
-        // 🔹 Kitap stoğu güncelle
         book.setCount(book.getCount() - 1);
         book.setAvailable(book.getCount() > 0);
 
         Borrow saved = borrowRepository.save(borrow);
-        availabilityPublisher.publish(book);  // 📡 REACTIVE güncelleme
+
+        availabilityPublisher.publish(
+                BookAvailabilityResponse.builder()
+                        .bookId(book.getId())
+                        .title(book.getTitle())
+                        .isAvailable(book.isAvailable())
+                        .build()
+        );
 
         log.info("User {} borrowed book '{}' from {} to {}", user.getEmail(), book.getTitle(), borrow.getBorrowDate(), borrow.getDueDate());
 
-        // 🔹 Kullanıcı puan ve istatistik güncellemesi
         user.setTotalBorrowedBooks(user.getTotalBorrowedBooks() + 1);
         int reward = user.getTotalBorrowedBooks() == 1 ? 3 : 1;
         user.setScore(user.getScore() + reward);
@@ -110,6 +125,11 @@ public class BorrowServiceImpl implements BorrowService {
             throw new InvalidRequestException("Book has already been returned.");
         }
 
+        User currentUser = getCurrentAuthenticatedUser();
+        if (!isLibrarian(currentUser) && !borrow.getUser().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("You can only return your own borrowed books.");
+        }
+
         LocalDate returnDate = LocalDate.now();
         LocalDate borrowDate = borrow.getBorrowDate();
         LocalDate dueDate = borrow.getDueDate();
@@ -120,12 +140,17 @@ public class BorrowServiceImpl implements BorrowService {
         Book book = borrow.getBook();
         User user = borrow.getUser();
 
-        // 🔹 Kitap stoğu iade işlemi
         book.setCount(book.getCount() + 1);
         book.setAvailable(true);
-        availabilityPublisher.publish(book);  // 📡 REACTIVE güncelleme
 
-        // 🔹 Puan hesaplama
+        availabilityPublisher.publish(
+                BookAvailabilityResponse.builder()
+                        .bookId(book.getId())
+                        .title(book.getTitle())
+                        .isAvailable(true)
+                        .build()
+        );
+
         int delta = 0;
         long delayDays = Duration.between(dueDate.atStartOfDay(), returnDate.atStartOfDay()).toDays();
         boolean isLate = delayDays > 0;
@@ -142,35 +167,47 @@ public class BorrowServiceImpl implements BorrowService {
             if (user.getStreakTimelyReturns() % 5 == 0) delta += 10;
         }
 
-        user.setScore(Math.max(0, user.getScore() + delta));
+        user.setScore(user.getScore() + delta);
         user.setLevel(LevelUtils.determineLevel(user.getScore()));
-
-        log.debug("User {} score changed by {} → new score: {}, level: {}", user.getEmail(), delta, user.getScore(), user.getLevel());
-
-        // 🔹 Kullanıcı istatistikleri
         user.setTotalReturnedBooks(user.getTotalReturnedBooks() + 1);
+
         long readingDays = Duration.between(borrowDate.atStartOfDay(), returnDate.atStartOfDay()).toDays();
         user.setTotalReadingDays(user.getTotalReadingDays() + (int) readingDays);
         user.setTotalReadPages(user.getTotalReadPages() + book.getPageCount());
+
+        log.info("User {} returned book '{}' on {}. Score delta: {}, new score: {}", user.getEmail(), book.getTitle(), returnDate, delta, user.getScore());
 
         userRepository.save(user);
         bookRepository.save(book);
         borrowRepository.save(borrow);
 
-        log.info("User {} returned book '{}' on {}", user.getEmail(), book.getTitle(), returnDate);
-
         return borrowMapper.toResponse(borrow);
     }
 
+
     @Override
     public List<BorrowResponse> getBorrowHistoryByUser(UUID userId) {
-        User user = userRepository.findById(userId)
+        // SecurityContext'ten kim giriş yaptıysa onu al
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInEmail = authentication.getName();
+
+        User loggedInUser = userRepository.findByEmail(loggedInEmail)
+                .orElseThrow(() -> new NotFoundException("Authenticated user not found"));
+
+        // Eğer kullanıcı patron ise sadece kendi geçmişini görebilmeli
+        if (loggedInUser.getRole().equals(Role.PATRON) && !loggedInUser.getId().equals(userId)) {
+            throw new InvalidRequestException("Patrons can only view their own borrow history.");
+        }
+
+        // İstenilen kullanıcıyı bul
+        User requestedUser = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        return borrowRepository.findByUser(user).stream()
+        return borrowRepository.findByUser(requestedUser).stream()
                 .map(borrowMapper::toResponse)
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public List<BorrowResponse> getAllBorrows() {
@@ -190,21 +227,34 @@ public class BorrowServiceImpl implements BorrowService {
         if (request.getEmail() == null || request.getEmail().isBlank()) {
             throw new InvalidRequestException("User email cannot be null or blank");
         }
-
         if (request.getBookId() == null) {
             throw new InvalidRequestException("Book ID cannot be null");
         }
-
         if (request.getBorrowDate() == null) {
             throw new InvalidRequestException("Borrow date cannot be null");
         }
-
-        if (request.getDueDate() == null) {
-            throw new InvalidRequestException("Due date cannot be null");
-        }
-
-        if (request.getDueDate().isBefore(request.getBorrowDate())) {
+        if (request.getDueDate() != null && request.getDueDate().isBefore(request.getBorrowDate())) {
             throw new InvalidRequestException("Due date cannot be before borrow date.");
         }
+    }
+
+    private void checkUserEligibility(User user) {
+        if (user.getScore() < -20) {
+            log.warn("User {} cannot borrow due to low score ({})", user.getEmail(), user.getScore());
+            throw new InvalidRequestException("Your score is too low to borrow books. Minimum allowed: -20");
+        }
+    }
+
+    private User getCurrentAuthenticatedUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new AccessDeniedException("Unauthorized access.");
+        }
+        return userRepository.findByEmail(auth.getName())
+                .orElseThrow(() -> new NotFoundException("Authenticated user not found."));
+    }
+
+    private boolean isLibrarian(User user) {
+        return user.getRole().name().equalsIgnoreCase("LIBRARIAN");
     }
 }
