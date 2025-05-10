@@ -12,10 +12,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/users")
@@ -34,24 +38,36 @@ public class UserController {
     public ResponseEntity<UserResponse> registerUser(@RequestBody UserRequest request) {
         return ResponseEntity.ok(userService.registerUser(request));
     }
-
     @GetMapping("/{id}")
     @Operation(summary = "Get user by ID", responses = {
             @ApiResponse(responseCode = "200", description = "User found",
                     content = @Content(schema = @Schema(implementation = UserResponse.class))),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
-    // @PreAuthorize("hasRole('LIBRARIAN') or hasRole('MANAGER')")
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'PATRON')")
     public ResponseEntity<UserResponse> getUserById(@PathVariable UUID id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserResponse user = userService.getUserById(id);
+
+        // Eğer patron ise kendi bilgisi mi kontrol et
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isLibrarian = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_LIBRARIAN"));
+
+        if (!isLibrarian && !user.getEmail().equals(currentEmail)) {
+            return ResponseEntity.status(403).build(); // Erişim reddedildi
+        }
+
+        return ResponseEntity.ok(user);
     }
+
 
     @GetMapping
     @Operation(summary = "Get all users", responses = {
             @ApiResponse(responseCode = "200", description = "Users retrieved",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))))
     })
-    // @PreAuthorize("hasRole('LIBRARIAN') or hasRole('MANAGER')")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
@@ -61,7 +77,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "User updated successfully"),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
-    // @PreAuthorize("hasRole('LIBRARIAN') or hasRole('MANAGER')")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public ResponseEntity<UserResponse> updateUser(@PathVariable UUID id, @RequestBody UserRequest request) {
         return ResponseEntity.ok(userService.updateUser(id, request));
     }
@@ -71,7 +87,7 @@ public class UserController {
             @ApiResponse(responseCode = "204", description = "User deleted successfully"),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
-    // @PreAuthorize("hasRole('LIBRARIAN') or hasRole('MANAGER')")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
@@ -83,8 +99,21 @@ public class UserController {
                     content = @Content(schema = @Schema(implementation = UserStatisticsResponse.class))),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'PATRON')")
     public ResponseEntity<UserStatisticsResponse> getUserStats(@PathVariable UUID id) {
+        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserResponse user = userService.getUserById(id);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isLibrarian = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_LIBRARIAN"));
+
+        if (!isLibrarian && !user.getEmail().equals(currentEmail)) {
+            return ResponseEntity.status(403).build(); // Erişim reddedildi
+        }
+
         return ResponseEntity.ok(userService.getUserStatistics(id));
     }
+
 
 }
