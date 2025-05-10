@@ -59,4 +59,17 @@ public class AuthorServiceImpl implements AuthorService {
                     return authorRepository.save(author);
                 });
     }
+    @Override
+    public void deleteAuthor(UUID id) {
+        Author author = authorRepository.findById(id)
+                .orElseThrow(() -> new InvalidRequestException("Author not found with id: " + id));
+
+        if (!author.getBooks().isEmpty()) {
+            throw new InvalidRequestException("Cannot delete author who has books assigned.");
+        }
+
+        authorRepository.delete(author);
+        log.info("Author with ID '{}' and name '{}' has been deleted.", author.getId(), author.getName());
+    }
+
 }
