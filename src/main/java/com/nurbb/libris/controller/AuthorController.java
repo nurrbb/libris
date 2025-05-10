@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +29,7 @@ public class AuthorController {
     private final AuthorService authorService;
     private final AuthorMapper authorMapper;
 
+    @PreAuthorize("hasRole('LIBRARIAN')")
     @PostMapping
     @Operation(summary = "Add a new author", responses = {
             @ApiResponse(responseCode = "200", description = "Author successfully created",
@@ -62,4 +64,13 @@ public class AuthorController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @PreAuthorize("hasRole('LIBRARIAN')")
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete an author by ID")
+    public ResponseEntity<Void> deleteAuthor(@PathVariable UUID id) {
+        authorService.deleteAuthor(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
