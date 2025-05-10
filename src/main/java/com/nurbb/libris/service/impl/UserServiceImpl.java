@@ -12,6 +12,7 @@ import com.nurbb.libris.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -35,11 +37,16 @@ public class UserServiceImpl implements UserService {
             log.warn("Registration failed. Email '{}' already in use.", request.getEmail());
             throw new InvalidRequestException("Email already registered.");
         }
+
         User user = userMapper.toEntity(request);
+
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
         User saved = userRepository.save(user);
         log.info("User '{}' registered with role '{}'", request.getEmail(), request.getRole());
         return userMapper.toResponse(saved);
     }
+
 
     @Override
     public UserResponse getUserById(UUID id) {
