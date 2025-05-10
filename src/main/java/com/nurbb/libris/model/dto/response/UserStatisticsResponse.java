@@ -1,5 +1,6 @@
 package com.nurbb.libris.model.dto.response;
 
+import com.nurbb.libris.model.entity.Level;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +11,7 @@ import lombok.Data;
 public class UserStatisticsResponse {
 
     private String email;
-    private String level;
+    private Level level;
     private int score;
 
     private int totalBorrowedBooks;
