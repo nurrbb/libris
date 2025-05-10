@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface AuthorService {
+public interface AuthorService
+{
     Author createAuthor(String name);
 
     List<Author> getAllAuthors();
@@ -16,5 +17,7 @@ public interface AuthorService {
     Optional<Author> getAuthorByName(String name);
 
     Author getAuthorByNameOrCreate(String name);
+
+    void deleteAuthor(UUID id);
 
 }
