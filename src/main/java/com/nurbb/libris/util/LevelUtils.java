@@ -1,25 +1,37 @@
 package com.nurbb.libris.util;
 
+import com.nurbb.libris.model.entity.Level;
+
 public class LevelUtils {
-    public static String determineLevel(int score) {
+    public static Level determineLevel(int score) {
         if (score < 50) {
-            return "Novice";
+            return Level.NOVICE;
         } else if (score < 100) {
-            return "Reader";
+            return Level.READER;
         } else if (score < 200) {
-            return "Bookworm";
+            return Level.BOOKWORM;
         } else {
-            return "Bibliophile";
+            return Level.BIBLIOPHILE;
         }
     }
 
-    public static int getMaxTotalBorrowDays(String level) {
+    public static int getMaxTotalBorrowDays(Level level) {
         return switch (level) {
-            case "Novice" -> 15;
-            case "Reader" -> 30;
-            case "Bookworm" -> 45;
-            case "Bibliophile" -> 60;
-            default -> 15;
+            case NOVICE -> 15;
+            case READER -> 30;
+            case BOOKWORM -> 45;
+            case BIBLIOPHILE -> 60;
         };
     }
+
+
+    public static int getDefaultBorrowDays(Level level) {
+        return switch (level) {
+            case NOVICE -> 5;
+            case READER -> 7;
+            case BOOKWORM -> 10;
+            case BIBLIOPHILE -> 14;
+        };
+    }
+
 }
