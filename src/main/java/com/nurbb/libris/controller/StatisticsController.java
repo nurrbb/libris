@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -21,6 +22,7 @@ public class StatisticsController {
 
     private final StatisticsService statisticsService;
 
+    @PreAuthorize("hasRole('LIBRARIAN')")
     @GetMapping
     @Operation(summary = "Get overall library statistics", description = "Returns book, user, borrow, and genre stats with text report",
             responses = {
@@ -31,6 +33,7 @@ public class StatisticsController {
         return ResponseEntity.ok(statisticsService.getLibraryStatistics());
     }
 
+    @PreAuthorize("hasRole('LIBRARIAN')")
     @GetMapping("/overdue")
     @Operation(summary = "Get overdue book statistics", description = "Returns total borrow count, overdue count, and overdue ratio",
             responses = {
