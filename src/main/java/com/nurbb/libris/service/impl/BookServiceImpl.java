@@ -3,10 +3,12 @@ package com.nurbb.libris.service.impl;
 import com.nurbb.libris.exception.InvalidRequestException;
 import com.nurbb.libris.exception.NotFoundException;
 import com.nurbb.libris.model.dto.request.BookRequest;
+import com.nurbb.libris.model.dto.response.BookAvailabilityResponse;
 import com.nurbb.libris.model.dto.response.BookResponse;
 import com.nurbb.libris.model.entity.Author;
 import com.nurbb.libris.model.entity.Book;
 import com.nurbb.libris.model.mapper.BookMapper;
+import com.nurbb.libris.reactive.BookAvailabilityPublisher;
 import com.nurbb.libris.repository.BookRepository;
 import com.nurbb.libris.service.AuthorService;
 import com.nurbb.libris.service.BookService;
@@ -16,19 +18,19 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
-@Slf4j
-@Service
 @RequiredArgsConstructor
+@Service
+@Slf4j
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
     private final AuthorService authorService;
     private final BookMapper bookMapper;
+    private final BookAvailabilityPublisher bookAvailabilityPublisher;
 
     @Override
     @Transactional
@@ -36,15 +38,19 @@ public class BookServiceImpl implements BookService {
         validateBookInput(request);
 
         if (bookRepository.existsByIsbn(request.getIsbn())) {
-            log.warn("Book with ISBN '{}' already exists.", request.getIsbn());
             throw new InvalidRequestException("Book with the same ISBN already exists.");
         }
-
-        log.info("Book '{}' added to the library by author '{}'", request.getTitle(), request.getAuthorName());
 
         Author author = authorService.getAuthorByNameOrCreate(request.getAuthorName());
         Book book = bookMapper.toEntity(request, author);
         Book saved = bookRepository.save(book);
+
+        // Real-time availability publish
+        bookAvailabilityPublisher.publish(BookAvailabilityResponse.builder()
+                .bookId(saved.getId())
+                .isAvailable(saved.isAvailable())
+                .title(saved.getTitle())
+                .build());
 
         return bookMapper.toResponse(saved);
     }
@@ -67,17 +73,17 @@ public class BookServiceImpl implements BookService {
     public Page<BookResponse> searchBooks(String query, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Set<Book> mergedResults = Stream.of(
+        var mergedResults = Stream.of(
                 bookRepository.findByTitleContainingIgnoreCase(query, pageable),
                 bookRepository.findByAuthor_NameContainingIgnoreCase(query, pageable),
                 bookRepository.findByIsbnContainingIgnoreCase(query, pageable)
-        ).flatMap(p -> p.getContent().stream()).collect(Collectors.toSet());
+        ).flatMap(p -> p.getContent().stream()).distinct().toList();
 
-        List<BookResponse> responseList = mergedResults.stream()
-                .map(bookMapper::toResponse)
-                .toList();
-
-        return new PageImpl<>(responseList, pageable, responseList.size());
+        return new PageImpl<>(
+                mergedResults.stream().map(bookMapper::toResponse).toList(),
+                pageable,
+                mergedResults.size()
+        );
     }
 
     @Override
@@ -98,8 +104,17 @@ public class BookServiceImpl implements BookService {
         existing.setAvailable(request.getCount() > 0);
         existing.setAuthor(author);
         existing.setPageCount(request.getPageCount());
-        log.info("Book with ID '{}' updated. New title: '{}', New count: {}", id, request.getTitle(), request.getCount());
-        return bookMapper.toResponse(bookRepository.save(existing));
+
+        Book saved = bookRepository.save(existing);
+
+        // Real-time availability publish
+        bookAvailabilityPublisher.publish(BookAvailabilityResponse.builder()
+                .bookId(saved.getId())
+                .isAvailable(saved.isAvailable())
+                .title(saved.getTitle())
+                .build());
+
+        return bookMapper.toResponse(saved);
     }
 
     @Override
@@ -107,10 +122,16 @@ public class BookServiceImpl implements BookService {
     public void deleteBook(UUID id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Book not found with id: " + id));
-        log.info("Book with ID '{}' and title '{}' deleted from the library", book.getId(), book.getTitle());
-        bookRepository.delete(book);
-    }
 
+        bookRepository.delete(book);
+
+        // Real-time availability removal notification
+        bookAvailabilityPublisher.publish(BookAvailabilityResponse.builder()
+                .bookId(book.getId())
+                .isAvailable(false)
+                .title(book.getTitle())
+                .build());
+    }
 
     private void validateBookInput(BookRequest request) {
         if (request.getTitle() == null || request.getTitle().isBlank()) {
@@ -135,5 +156,4 @@ public class BookServiceImpl implements BookService {
             throw new InvalidRequestException("Page count must be greater than 0");
         }
     }
-
 }
