@@ -33,8 +33,8 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private int score = 0;
 
-    @Column(nullable = false)
-    private String level = "Novice";
+    @Enumerated(EnumType.STRING)
+    private Level level =Level.NOVICE;
 
     @Column(nullable = false)
     private int totalBorrowedBooks = 0;
