@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class BorrowController {
 
     private final BorrowService borrowService;
 
+    @PreAuthorize("hasRole('LIBRARIAN')")
     @PostMapping
     @Operation(summary = "Borrow a book", responses = {
             @ApiResponse(responseCode = "200", description = "Book successfully borrowed",
@@ -34,6 +36,7 @@ public class BorrowController {
         return ResponseEntity.ok(borrowService.borrowBook(request));
     }
 
+    @PreAuthorize("hasRole('LIBRARIAN')")
     @PutMapping("/return/{borrowId}")
     @Operation(summary = "Return a borrowed book", responses = {
             @ApiResponse(responseCode = "200", description = "Book successfully returned",
@@ -44,6 +47,7 @@ public class BorrowController {
         return ResponseEntity.ok(borrowService.returnBook(borrowId));
     }
 
+    @PreAuthorize("hasRole('LIBRARIAN')")
     @GetMapping("/user/{userId}")
     @Operation(summary = "Get borrowing history for a user", responses = {
             @ApiResponse(responseCode = "200", description = "User's borrowing history retrieved",
@@ -53,6 +57,7 @@ public class BorrowController {
         return ResponseEntity.ok(borrowService.getBorrowHistoryByUser(userId));
     }
 
+    @PreAuthorize("hasRole('LIBRARIAN')")
     @GetMapping
     @Operation(summary = "Get all borrow records", responses = {
             @ApiResponse(responseCode = "200", description = "All borrow records retrieved",
@@ -62,6 +67,7 @@ public class BorrowController {
         return ResponseEntity.ok(borrowService.getAllBorrows());
     }
 
+    @PreAuthorize("hasRole('LIBRARIAN')")
     @GetMapping("/overdue")
     @Operation(summary = "Get overdue borrow records", responses = {
             @ApiResponse(responseCode = "200", description = "Overdue borrow records retrieved",
