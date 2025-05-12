@@ -20,6 +20,4 @@ public class Author extends BaseEntity{
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Book> books = new ArrayList<>();
-
-
 }
