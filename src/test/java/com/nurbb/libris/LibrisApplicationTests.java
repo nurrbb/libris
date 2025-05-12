@@ -8,6 +8,8 @@ class LibrisApplicationTests {
 
     @Test
     void contextLoads() {
+        LibrisApplication.main(new String[] {});
+
     }
 
 }
