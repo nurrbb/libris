@@ -12,7 +12,7 @@ Libris is a full-featured library management system built with Spring Boot 3 and
     - Add, update, delete (soft delete), view, and search books by title, author, genre, ISBN
     - Pagination and case-insensitive search
 - **User Management**
-    - User registration and role-based control (GUEST, USER, LIBRARIAN, MANAGER)
+    - User registration and role-based control (GUEST, USER, LIBRARIAN)
     - CRUD operations for user data (with identity-based access rules)
 - **Borrowing & Returning**
     - Borrow with due date and eligibility checks
@@ -49,7 +49,7 @@ Libris is a full-featured library management system built with Spring Boot 3 and
     - Real-time availability stream with Observer Pattern
 - ✅ **🔐 Identity Access Logic**
     - Users can only access/edit their own data
-    - Librarians and managers have advanced control
+    - Librarians have advanced control
 - ✅ **🗂️ Soft Delete**
     - Instead of permanent deletion, records are flagged to preserve data history
 - ✅ **🪪 Role-Permission Matrix**
@@ -125,14 +125,14 @@ docker-compose up --build
 
 ### Book
 
-| Method | Endpoint                      | Role              |
-|--------|-------------------------------|-------------------|
-| GET    | `/api/books`                  | All               |
-| GET    | `/api/books/{id}`             | All               |
-| POST   | `/api/books`                  | LIBRARIAN, MANAGER |
-| PUT    | `/api/books/{id}`             | LIBRARIAN, MANAGER |
-| DELETE | `/api/books/{id}`             | LIBRARIAN, MANAGER |
-| GET    | `/api/books/reactive/search`  | All (WebFlux)     |
+| Method | Endpoint                      | Role          |
+|--------|-------------------------------|---------------|
+| GET    | `/api/books`                  | All           |
+| GET    | `/api/books/{id}`             | All           |
+| POST   | `/api/books`                  | LIBRARIAN,    |
+| PUT    | `/api/books/{id}`             | LIBRARIAN,    |
+| DELETE | `/api/books/{id}`             | LIBRARIAN,    |
+| GET    | `/api/books/reactive/search`  | All (WebFlux) |
 
 ### User
 
@@ -153,12 +153,12 @@ docker-compose up --build
 
 ### Statistics
 
-| Method | Endpoint                                 | Role               |
-|--------|------------------------------------------|--------------------|
-| GET    | `/api/statistics/most-borrowed`          | LIBRARIAN, MANAGER |
-| GET    | `/api/statistics/overdue-ratio`          | LIBRARIAN, MANAGER |
-| GET    | `/api/statistics/monthly-borrow-counts`  | LIBRARIAN, MANAGER |
-| GET    | `/api/statistics/average-return-time`    | LIBRARIAN, MANAGER |
+| Method | Endpoint                                 | Role       |
+|--------|------------------------------------------|------------|
+| GET    | `/api/statistics/most-borrowed`          | LIBRARIAN  |
+| GET    | `/api/statistics/overdue-ratio`          | LIBRARIAN  |
+| GET    | `/api/statistics/monthly-borrow-counts`  | LIBRARIAN  |
+| GET    | `/api/statistics/average-return-time`    | LIBRARIAN  |
 
 > See Swagger for full request/response details.
 
@@ -171,7 +171,6 @@ docker-compose up --build
 | GUEST      | View/Search            | ❌                    | ❌                      | ❌                  |
 | USER       | View/Search            | View/Update Self      | Borrow/Return/View Own | ❌                  |
 | LIBRARIAN  | Full CRUD              | Full CRUD             | View All / Overdue     | ✅                  |
-| MANAGER    | Full CRUD              | Full CRUD             | View All / Overdue     | ✅ (All statistics) |
 
 > ✅ = full access, ❌ = no access
 
