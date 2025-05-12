@@ -1,6 +1,6 @@
 package com.nurbb.libris.model.dto.request;
 
-import com.nurbb.libris.model.entity.Role;
+import com.nurbb.libris.model.entity.valueobject.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,19 +14,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserRequest {
 
-    @NotBlank
+    @NotBlank(message = "Full name must not be blank")
     private String fullName;
 
-    @Email
-    @NotBlank
+    @Email(message = "Email format is invalid")
+    @NotBlank(message = "Email must not be blank")
     private String email;
 
-    @Size(min = 5, message = "Minimum password length: 5 characters")
-    @NotBlank
+    @Size(min = 5, message = "Password must be at least 5 characters")
+    @NotBlank(message = "Password must not be blank")
     private String password;
 
     private String phone;
 
-    @NotNull
     private Role role;
 }
