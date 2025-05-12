@@ -7,6 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SimpleCount {
+
     private String name;
     private long count;
 }
