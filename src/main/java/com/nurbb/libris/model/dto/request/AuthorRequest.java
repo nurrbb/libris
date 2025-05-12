@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AuthorRequest {
 
-    @NotBlank
+    @NotBlank(message = "Author name must not be blank")
     private String name;
 }
