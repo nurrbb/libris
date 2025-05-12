@@ -6,6 +6,8 @@ import com.nurbb.libris.repository.AuthorRepository;
 import com.nurbb.libris.service.AuthorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,12 +34,13 @@ public class AuthorServiceImpl implements AuthorService {
         return authorRepository.save(author);
     }
 
-
+    @Cacheable(value = "authorList")
     @Override
     public List<Author> getAllAuthors() {
         return authorRepository.findAll();
     }
 
+    @Cacheable(value = "authorById", key = "#id")
     @Override
     public Optional<Author> getAuthorById(UUID id) {
         return authorRepository.findById(id);
@@ -59,6 +62,10 @@ public class AuthorServiceImpl implements AuthorService {
                     return authorRepository.save(author);
                 });
     }
+
+// Deletes the author by ID if they have no assigned books (evicts cache)
+
+    @CacheEvict(value = { "authorList", "authorById" }, key = "#id")
     @Override
     public void deleteAuthor(UUID id) {
         Author author = authorRepository.findById(id)
@@ -71,5 +78,4 @@ public class AuthorServiceImpl implements AuthorService {
         authorRepository.delete(author);
         log.info("Author with ID '{}' and name '{}' has been deleted.", author.getId(), author.getName());
     }
-
 }
