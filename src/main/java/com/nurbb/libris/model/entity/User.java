@@ -1,5 +1,7 @@
 package com.nurbb.libris.model.entity;
 
+import com.nurbb.libris.model.entity.valueobject.Level;
+import com.nurbb.libris.model.entity.valueobject.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
