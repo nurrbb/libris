@@ -10,10 +10,13 @@ import com.nurbb.libris.model.entity.Book;
 import com.nurbb.libris.model.mapper.BookMapper;
 import com.nurbb.libris.reactive.BookAvailabilityPublisher;
 import com.nurbb.libris.repository.BookRepository;
+import com.nurbb.libris.repository.BorrowRepository;
 import com.nurbb.libris.service.AuthorService;
 import com.nurbb.libris.service.BookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,12 +33,14 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final AuthorService authorService;
     private final BookMapper bookMapper;
+    private final BorrowRepository borrowRepository;
     private final BookAvailabilityPublisher bookAvailabilityPublisher;
 
+
+    @CacheEvict(value = { "bookList", "libraryStatistics" }, allEntries = true)
     @Override
     @Transactional
     public BookResponse addBook(BookRequest request) {
-        validateBookInput(request);
 
         if (bookRepository.existsByIsbn(request.getIsbn())) {
             throw new InvalidRequestException("Book with the same ISBN already exists.");
@@ -62,6 +67,7 @@ public class BookServiceImpl implements BookService {
         return bookMapper.toResponse(book);
     }
 
+    @Cacheable(value = "bookList")
     @Override
     public List<BookResponse> getAllBooks() {
         return bookRepository.findAll().stream()
@@ -89,7 +95,6 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public BookResponse updateBook(UUID id, BookRequest request) {
-        validateBookInput(request);
 
         Book existing = bookRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Book not found with id: " + id));
@@ -117,43 +122,66 @@ public class BookServiceImpl implements BookService {
         return bookMapper.toResponse(saved);
     }
 
+    /**
+     * Decreases the book count by one and updates availability.
+     * Prevents deletion if all copies are currently borrowed.
+     */
+
+    @CacheEvict(value = { "bookList", "libraryStatistics", "overdueStats" }, allEntries = true)
     @Override
     @Transactional
     public void deleteBook(UUID id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Book not found with id: " + id));
 
-        bookRepository.delete(book);
+        long activeBorrows = borrowRepository.countByBookIdAndReturnedFalse(id);
 
-        // Real-time availability removal notification
+        if (book.getCount() <= activeBorrows) {
+            throw new InvalidRequestException("Cannot delete this book. All copies are currently borrowed.");
+        }
+
+        book.setCount(book.getCount() - 1);
+        book.setAvailable(book.getCount() > activeBorrows);
+        bookRepository.save(book);
+
+        // Real-time availability update
         bookAvailabilityPublisher.publish(BookAvailabilityResponse.builder()
                 .bookId(book.getId())
-                .isAvailable(false)
+                .isAvailable(book.isAvailable())
                 .title(book.getTitle())
                 .build());
-    }
 
-    private void validateBookInput(BookRequest request) {
-        if (request.getTitle() == null || request.getTitle().isBlank()) {
-            throw new InvalidRequestException("Book title cannot be empty");
-        }
-        if (request.getIsbn() == null || request.getIsbn().isBlank()) {
-            throw new InvalidRequestException("ISBN cannot be empty");
-        }
-        if (request.getAuthorName() == null || request.getAuthorName().isBlank()) {
-            throw new InvalidRequestException("Author name must be specified");
-        }
-        if (request.getCount() == null || request.getCount() < 0) {
-            throw new InvalidRequestException("Book count must be 0 or greater");
-        }
-        if (request.getPublishedDate() == null) {
-            throw new InvalidRequestException("Published date cannot be null");
-        }
-        if (request.getGenre() == null) {
-            throw new InvalidRequestException("Genre must be provided");
-        }
-        if (request.getPageCount() <= 0) {
-            throw new InvalidRequestException("Page count must be greater than 0");
-        }
+        log.info("One copy of '{}' deleted. Remaining: {}, Active borrows: {}",
+                book.getTitle(), book.getCount(), activeBorrows);
     }
+/*
+ This method was commented out temporarily to avoid redundant manual validation,
+ since validation is now expected to be handled globally via @Valid and DTO-level constraints.
+
+ private void validateBookInput(BookRequest request) {
+     if (request.getTitle() == null || request.getTitle().isBlank()) {
+         throw new InvalidRequestException("Book title cannot be empty");
+     }
+     if (request.getIsbn() == null || request.getIsbn().isBlank()) {
+         throw new InvalidRequestException("ISBN cannot be empty");
+     }
+     if (request.getAuthorName() == null || request.getAuthorName().isBlank()) {
+         throw new InvalidRequestException("Author name must be specified");
+     }
+     if (request.getCount() == null || request.getCount() < 0) {
+         throw new InvalidRequestException("Book count must be 0 or greater");
+     }
+     if (request.getPublishedDate() == null) {
+         throw new InvalidRequestException("Published date cannot be null");
+     }
+     if (request.getGenre() == null) {
+         throw new InvalidRequestException("Genre must be provided");
+     }
+     if (request.getPageCount() <= 0) {
+         throw new InvalidRequestException("Page count must be greater than 0");
+     }
+ }
+*/
+
+
 }
