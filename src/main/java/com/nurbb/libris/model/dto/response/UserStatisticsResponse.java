@@ -1,6 +1,6 @@
 package com.nurbb.libris.model.dto.response;
 
-import com.nurbb.libris.model.entity.Level;
+import com.nurbb.libris.model.entity.valueobject.Level;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
