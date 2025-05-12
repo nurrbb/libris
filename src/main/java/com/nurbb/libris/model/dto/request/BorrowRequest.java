@@ -13,15 +13,15 @@ import java.util.UUID;
 @AllArgsConstructor
 public class BorrowRequest {
 
-    @NotNull
-    private UUID bookId; //name?
+    @NotNull(message = "Book ID is required")
+    private UUID bookId;
 
-    @NotNull
+    @NotNull(message = "User email is required")
     private String email;
 
-    @NotNull
+    @NotNull(message = "Borrow date is required")
     private LocalDate borrowDate;
 
-    @NotNull
+    @NotNull(message = "Due date is required")
     private LocalDate dueDate;
 }
