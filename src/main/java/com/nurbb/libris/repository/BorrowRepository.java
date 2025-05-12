@@ -1,5 +1,6 @@
 package com.nurbb.libris.repository;
 
+import com.nurbb.libris.model.entity.Book;
 import com.nurbb.libris.model.entity.Borrow;
 import com.nurbb.libris.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,19 +11,15 @@ import java.util.UUID;
 
 public interface BorrowRepository extends JpaRepository<Borrow, UUID> {
 
-    List<Borrow> findByUserId(UUID userId);
-
-    List<Borrow> findByBookId(UUID bookId);
-
     List<Borrow> findByUser(User user);
 
-    List<Borrow> findByReturnedFalse();
+    List<Borrow> findByReturnedFalseAndDueDateBefore(LocalDate date);
 
-    List<Borrow> findByReturnedFalseAndDueDateBefore(LocalDate date); // Overdue
+    long countByBookIdAndReturnedFalse(UUID bookId);
 
-    List<Borrow> findByUserIdAndReturnedFalse(UUID userId);
+    boolean existsByUserAndReturnedFalse(User user);
 
-    List<Borrow> findByDueDateBeforeAndReturnedFalse(LocalDate today);
+    boolean existsByBookAndUserAndReturnedFalse(Book book, User user);
 
 
 }
