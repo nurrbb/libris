@@ -1,17 +1,26 @@
 package com.nurbb.libris.service.impl;
 
 import com.nurbb.libris.exception.InvalidRequestException;
+import com.nurbb.libris.repository.BorrowRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.access.AccessDeniedException;
 import com.nurbb.libris.exception.NotFoundException;
 import com.nurbb.libris.model.dto.request.UserRequest;
 import com.nurbb.libris.model.dto.response.UserResponse;
 import com.nurbb.libris.model.dto.response.UserStatisticsResponse;
 import com.nurbb.libris.model.entity.User;
+import com.nurbb.libris.model.entity.valueobject.Role;
 import com.nurbb.libris.model.mapper.UserMapper;
 import com.nurbb.libris.repository.UserRepository;
 import com.nurbb.libris.service.UserService;
+import com.nurbb.libris.util.LevelUtils;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,29 +34,63 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final BorrowRepository  borrowRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+
+    /**
+     * Registers a new user. Automatically assigns role based on authentication status.
+     * Password is encoded. Prevents duplicate email registration.
+     */
 
     @Override
     @Transactional
     public UserResponse registerUser(UserRequest request) {
-        validateUserInput(request);
 
         if (userRepository.existsByEmail(request.getEmail())) {
             log.warn("Registration failed. Email '{}' already in use.", request.getEmail());
             throw new InvalidRequestException("Email already registered.");
         }
 
-        User user = userMapper.toEntity(request);
+        // Determine if user is authenticated (e.g., librarian creating another user)
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAuthenticated = auth != null && auth.isAuthenticated()
+                && !(auth.getPrincipal().equals("anonymousUser"));
 
+        if (!isAuthenticated) {
+
+            request.setRole(Role.PATRON);
+
+        } else {
+            // Only librarians can assign LIBRARIAN role
+            boolean isLibrarian = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_LIBRARIAN"));
+
+            if (!isLibrarian && request.getRole() == Role.LIBRARIAN) {
+                throw new AccessDeniedException("Only librarians can create librarian accounts.");
+            }
+
+            if (!isLibrarian) {
+                request.setRole(Role.PATRON);
+            }
+
+            if (isLibrarian && request.getRole() == null) {
+                throw new InvalidRequestException("Librarians must specify a role.");
+            }
+        }
+
+        // Encode password and assign defaults
+        User user = userMapper.toEntity(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setScore(0);
+        user.setLevel(com.nurbb.libris.util.LevelUtils.determineLevel(0));
 
         User saved = userRepository.save(user);
         log.info("User '{}' registered with role '{}'", request.getEmail(), request.getRole());
         return userMapper.toResponse(saved);
     }
 
-
+    @Cacheable(value = "userById", key = "#id")
     @Override
     public UserResponse getUserById(UUID id) {
         User user = userRepository.findById(id)
@@ -63,6 +106,7 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    @CacheEvict(value = "userById", key = "#id")
     @Override
     @Transactional
     public UserResponse updateUser(UUID id, UserRequest request) {
@@ -103,25 +147,50 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+    /**
+     * Deletes a user by ID only if they have no active borrows.
+     * Evicts cache.
+     */
+
+    @CacheEvict(value = "userById", key = "#id")
     @Override
     @Transactional
     public void deleteUser(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
+
+        boolean hasActiveBorrows = borrowRepository.existsByUserAndReturnedFalse(user);
+
+        if (hasActiveBorrows) {
+            throw new InvalidRequestException("This user still has borrowed books. Please return them first.");
+        }
+
         log.info("User with ID '{}' and email '{}' deleted.", user.getId(), user.getEmail());
         userRepository.delete(user);
     }
 
-    private void validateUserInput(UserRequest request) {
-        if (request.getFullName() == null || request.getFullName().trim().isEmpty()) {
-            throw new InvalidRequestException("Full name cannot be empty");
-        }
-        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
-            throw new InvalidRequestException("Email cannot be empty");
-        }
-        if (request.getRole() == null) {
-            throw new InvalidRequestException("User role must be specified");
+    /**
+     * Initializes a default admin user if not already present in the database.
+     */
+
+    @PostConstruct
+    public void initAdminUser() {
+        String adminEmail = "admin@libris.com";
+
+        if (!userRepository.existsByEmail(adminEmail)) {
+            User admin = new User();
+            admin.setFullName("System Admin");
+            admin.setEmail(adminEmail);
+            admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setRole(Role.LIBRARIAN);
+            admin.setPhone(null);
+            admin.setScore(0);
+            admin.setLevel(LevelUtils.determineLevel(0));
+
+            userRepository.save(admin);
+            log.info("Default admin user created: {}", adminEmail);
+        } else {
+            log.info("Admin user already exists: {}", adminEmail);
         }
     }
-
 }
