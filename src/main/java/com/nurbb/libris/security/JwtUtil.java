@@ -23,10 +23,9 @@ public class JwtUtil {
     }
 
     public String generateToken(UserDetails userDetails) {
-        // Spring Security'de authority'ler genelde "ROLE_LIBRARIAN" gibi gelir,
-        // ama JWT içine sadece "LIBRARIAN" gibi saf rol ismini koymalısın
-        String fullRole = userDetails.getAuthorities().iterator().next().getAuthority(); // örn: ROLE_LIBRARIAN
-        String role = fullRole.replaceFirst("^ROLE_", ""); // sadece LIBRARIAN kısmı alınır
+
+        String fullRole = userDetails.getAuthorities().iterator().next().getAuthority();
+        String role = fullRole.replaceFirst("^ROLE_", "");
 
         return Jwts.builder()
                 .subject(userDetails.getUsername())
@@ -36,7 +35,6 @@ public class JwtUtil {
                 .signWith(key)
                 .compact();
     }
-
 
     public boolean validateToken(String token, UserDetails userDetails) {
         try {
