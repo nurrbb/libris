@@ -11,6 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthorResponse {
+
     private UUID id;
     private String name;
     private Set<String> books;
