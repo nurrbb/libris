@@ -18,7 +18,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class BaseEntity {
 
-
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
@@ -34,13 +33,11 @@ public class BaseEntity {
     @PrePersist
     protected void onCreate() {
         if (id == null) {
-            id = UUID.randomUUID(); // ID otomatik üretilir
+            id = UUID.randomUUID();
         }
         if (createdDate == null) {
-            createdDate = LocalDateTime.now(); // Auditing çalışmazsa fallback
+            createdDate = LocalDateTime.now();
         }
-        updatedDate = LocalDateTime.now(); // İlk seferde güncelleme tarihi de yazılır
+        updatedDate = LocalDateTime.now();
     }
-
-    //  Immutable status update using Lombok's @With
 }
