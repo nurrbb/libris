@@ -1,6 +1,10 @@
 package com.nurbb.libris.util;
 
-import com.nurbb.libris.model.entity.Level;
+import com.nurbb.libris.model.entity.valueobject.Level;
+
+/**
+ * Utility class for determining user level and borrow duration rules based on score.
+ */
 
 public class LevelUtils {
     public static Level determineLevel(int score) {
@@ -15,6 +19,10 @@ public class LevelUtils {
         }
     }
 
+    /**
+     * Returns the maximum total borrowable days for the given user level.
+     */
+
     public static int getMaxTotalBorrowDays(Level level) {
         return switch (level) {
             case NOVICE -> 15;
@@ -24,6 +32,9 @@ public class LevelUtils {
         };
     }
 
+    /**
+     * Returns the default borrow period (in days) for a new borrow based on user level.
+     */
 
     public static int getDefaultBorrowDays(Level level) {
         return switch (level) {
@@ -33,5 +44,4 @@ public class LevelUtils {
             case BIBLIOPHILE -> 14;
         };
     }
-
 }
