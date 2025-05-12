@@ -10,6 +10,7 @@ import com.nurbb.libris.repository.UserRepository;
 import com.nurbb.libris.service.StatisticsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -30,9 +31,12 @@ public class StatisticsServiceImpl implements StatisticsService {
     private final BorrowRepository borrowRepository;
     private final UserRepository userRepository;
 
+    @Cacheable(value = "libraryStatistics")
     @Override
     public LibraryStatisticsResponse getLibraryStatistics() {
+
         log.info("Generating full library statistics...");
+
         long totalBooks = bookRepository.count();
         long totalUsers = userRepository.count();
         long totalBorrows = borrowRepository.count();
@@ -80,28 +84,25 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .map(e -> new SimpleCount(e.getKey(), e.getValue()))
                 .toList();
 
-        String textReport = """
-                LIBRARY STATISTICS REPORT
-                ----------------------------
-                Total Books        : %d
-                Available Books    : %d
-                Borrowed Books     : %d
-                Overdue Books      : %d
-                Total Users        : %d
-                Total Borrows      : %d
-                Avg Return (days)  : %.2f
+        StringBuilder reportBuilder = new StringBuilder();
+        reportBuilder.append("LIBRARY STATISTICS REPORT\n");
+        reportBuilder.append("----------------------------\n");
+        reportBuilder.append("Total Books        : ").append(totalBooks).append("\n");
+        reportBuilder.append("Available Books    : ").append(availableBooks).append("\n");
+        reportBuilder.append("Borrowed Books     : ").append(borrowedBooks).append("\n");
+        reportBuilder.append("Overdue Books      : ").append(overdueBooks).append("\n");
+        reportBuilder.append("Total Users        : ").append(totalUsers).append("\n");
+        reportBuilder.append("Total Borrows      : ").append(totalBorrows).append("\n");
+        reportBuilder.append("Avg Return (days)  : ").append(String.format("%.2f", avgReturnDays)).append("\n");
+        reportBuilder.append("Last Updated       : ").append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))).append("\n\n");
 
-                Last Updated       : %s
-                """.formatted(
-                totalBooks,
-                availableBooks,
-                borrowedBooks,
-                overdueBooks,
-                totalUsers,
-                totalBorrows,
-                avgReturnDays,
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-        );
+        reportBuilder.append("Top Genres:\n");
+        topGenres.forEach(g -> reportBuilder.append(" - ").append(g.getName()).append(" (").append(g.getCount()).append(")\n"));
+
+        reportBuilder.append("\nMost Borrowed Books:\n");
+        mostBorrowedBooks.forEach(b -> reportBuilder.append(" - ").append(b.getName()).append(" (").append(b.getCount()).append(")\n"));
+
+        String textReport = reportBuilder.toString();
 
         log.debug("Library statistics generated: totalBooks={}, totalUsers={}, overdueBooks={}",
                 totalBooks, totalUsers, overdueBooks);
@@ -118,9 +119,10 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .topGenres(topGenres)
                 .textReport(textReport)
                 .build();
-
     }
 
+
+    @Cacheable(value = "overdueStats")
     @Override
     public Map<String, Object> getOverdueBookStatistics() {
         log.info("Generating overdue borrow statistics...");
