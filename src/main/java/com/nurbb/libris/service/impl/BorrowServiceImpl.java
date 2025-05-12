@@ -8,7 +8,7 @@ import com.nurbb.libris.model.dto.response.BookAvailabilityResponse;
 import com.nurbb.libris.model.dto.response.BorrowResponse;
 import com.nurbb.libris.model.entity.Book;
 import com.nurbb.libris.model.entity.Borrow;
-import com.nurbb.libris.model.entity.Role;
+import com.nurbb.libris.model.entity.valueobject.Role;
 import com.nurbb.libris.model.entity.User;
 import com.nurbb.libris.model.mapper.BorrowMapper;
 import com.nurbb.libris.reactive.BookAvailabilityPublisher;
@@ -18,8 +18,11 @@ import com.nurbb.libris.repository.UserRepository;
 import com.nurbb.libris.service.BorrowService;
 import com.nurbb.libris.util.LevelUtils;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,10 +45,19 @@ public class BorrowServiceImpl implements BorrowService {
     private final BorrowMapper borrowMapper;
     private final BookAvailabilityPublisher availabilityPublisher;
 
+    /**
+     * Borrows a book if it's available and the user is eligible.
+     * Updates user score, level, and book availability in real time.
+     */
+
+    @CacheEvict(
+            value = { "borrowHistory", "libraryStatistics", "overdueStats", "userById" },
+            key = "#request.email",
+            allEntries = true
+    )
     @Transactional
     @Override
-    public BorrowResponse borrowBook(BorrowRequest request) {
-        validateBorrowInput(request);
+    public BorrowResponse borrowBook(@Valid BorrowRequest request) {
 
         Book book = bookRepository.findById(request.getBookId())
                 .orElseThrow(() -> new NotFoundException("Book not found"));
@@ -59,14 +71,21 @@ public class BorrowServiceImpl implements BorrowService {
 
         checkUserEligibility(user);
 
+        if (borrowRepository.existsByBookAndUserAndReturnedFalse(book, user)) {
+            throw new InvalidRequestException("This user has already borrowed this book and has not returned it yet.");
+        }
+
+        // Update level based on score
         user.setLevel(LevelUtils.determineLevel(user.getScore()));
         int maxAllowedDays = LevelUtils.getMaxTotalBorrowDays(user.getLevel());
 
+        // Set due date if not provided (based on level default)
         if (request.getDueDate() == null) {
             int defaultDays = LevelUtils.getDefaultBorrowDays(user.getLevel());
             request.setDueDate(request.getBorrowDate().plusDays(defaultDays));
         }
 
+        // Get user's currently active (not returned) borrows
         List<Borrow> activeBorrows = borrowRepository.findByUser(user).stream()
                 .filter(b -> !b.getReturned())
                 .toList();
@@ -115,16 +134,28 @@ public class BorrowServiceImpl implements BorrowService {
         return borrowMapper.toResponse(saved);
     }
 
-    @Transactional
+    /**
+     * Returns a borrowed book.
+     * Calculates score delta based on return timing and updates user stats accordingly.
+     */
+
+    @CacheEvict(
+            value = { "borrowHistory", "libraryStatistics", "overdueStats" },
+            allEntries = true
+    )    @Transactional
     @Override
     public BorrowResponse returnBook(UUID borrowId) {
+
         Borrow borrow = borrowRepository.findById(borrowId)
                 .orElseThrow(() -> new NotFoundException("Borrow record not found"));
+
+        User user = borrow.getUser();
 
         if (borrow.getReturned()) {
             throw new InvalidRequestException("Book has already been returned.");
         }
 
+        // Ensure that only librarians or the borrowing user can return the book
         User currentUser = getCurrentAuthenticatedUser();
         if (!isLibrarian(currentUser) && !borrow.getUser().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You can only return your own borrowed books.");
@@ -138,7 +169,6 @@ public class BorrowServiceImpl implements BorrowService {
         borrow.setReturnDate(returnDate);
 
         Book book = borrow.getBook();
-        User user = borrow.getUser();
 
         book.setCount(book.getCount() + 1);
         book.setAvailable(true);
@@ -152,6 +182,12 @@ public class BorrowServiceImpl implements BorrowService {
         );
 
         int delta = 0;
+
+        // Update user score based on return timing:
+        // - Late: -3 (≤7 days) or -6 (>7 days), reset streak
+        // - On time: +5, +2 bonus if early, +10 bonus every 5 timely returns
+        // Then update level, reading stats, and save all changes.
+
         long delayDays = Duration.between(dueDate.atStartOfDay(), returnDate.atStartOfDay()).toDays();
         boolean isLate = delayDays > 0;
         boolean isEarly = returnDate.isBefore(dueDate.minusDays(1));
@@ -184,22 +220,25 @@ public class BorrowServiceImpl implements BorrowService {
         return borrowMapper.toResponse(borrow);
     }
 
+    /**
+     * Retrieves the borrowing history of a specific user.
+     * Patrons can only access their own records.
+     */
 
+    @Cacheable(value = "borrowHistory", key = "#userId")
     @Override
     public List<BorrowResponse> getBorrowHistoryByUser(UUID userId) {
-        // SecurityContext'ten kim giriş yaptıysa onu al
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String loggedInEmail = authentication.getName();
 
         User loggedInUser = userRepository.findByEmail(loggedInEmail)
                 .orElseThrow(() -> new NotFoundException("Authenticated user not found"));
 
-        // Eğer kullanıcı patron ise sadece kendi geçmişini görebilmeli
         if (loggedInUser.getRole().equals(Role.PATRON) && !loggedInUser.getId().equals(userId)) {
             throw new InvalidRequestException("Patrons can only view their own borrow history.");
         }
 
-        // İstenilen kullanıcıyı bul
         User requestedUser = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
@@ -223,27 +262,16 @@ public class BorrowServiceImpl implements BorrowService {
                 .collect(Collectors.toList());
     }
 
-    private void validateBorrowInput(BorrowRequest request) {
-        if (request.getEmail() == null || request.getEmail().isBlank()) {
-            throw new InvalidRequestException("User email cannot be null or blank");
-        }
-        if (request.getBookId() == null) {
-            throw new InvalidRequestException("Book ID cannot be null");
-        }
-        if (request.getBorrowDate() == null) {
-            throw new InvalidRequestException("Borrow date cannot be null");
-        }
-        if (request.getDueDate() != null && request.getDueDate().isBefore(request.getBorrowDate())) {
-            throw new InvalidRequestException("Due date cannot be before borrow date.");
-        }
-    }
-
     private void checkUserEligibility(User user) {
         if (user.getScore() < -20) {
             log.warn("User {} cannot borrow due to low score ({})", user.getEmail(), user.getScore());
             throw new InvalidRequestException("Your score is too low to borrow books. Minimum allowed: -20");
         }
     }
+
+    /**
+     * Returns the currently authenticated user from security context.
+     */
 
     private User getCurrentAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -257,4 +285,34 @@ public class BorrowServiceImpl implements BorrowService {
     private boolean isLibrarian(User user) {
         return user.getRole().name().equalsIgnoreCase("LIBRARIAN");
     }
+
+    /*
+ This method was commented out temporarily to avoid redundant manual validation,
+ since validation is now expected to be handled globally via @Valid and DTO-level constraints.
+
+ private void validateBookInput(BookRequest request) {
+     if (request.getTitle() == null || request.getTitle().isBlank()) {
+         throw new InvalidRequestException("Book title cannot be empty");
+     }
+     if (request.getIsbn() == null || request.getIsbn().isBlank()) {
+         throw new InvalidRequestException("ISBN cannot be empty");
+     }
+     if (request.getAuthorName() == null || request.getAuthorName().isBlank()) {
+         throw new InvalidRequestException("Author name must be specified");
+     }
+     if (request.getCount() == null || request.getCount() < 0) {
+         throw new InvalidRequestException("Book count must be 0 or greater");
+     }
+     if (request.getPublishedDate() == null) {
+         throw new InvalidRequestException("Published date cannot be null");
+     }
+     if (request.getGenre() == null) {
+         throw new InvalidRequestException("Genre must be provided");
+     }
+     if (request.getPageCount() <= 0) {
+         throw new InvalidRequestException("Page count must be greater than 0");
+     }
+ }
+*/
+
 }
