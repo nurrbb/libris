@@ -1,12 +1,16 @@
 package com.nurbb.libris.model.dto.response;
 
-import com.nurbb.libris.model.entity.Genre;
+import com.nurbb.libris.model.entity.valueobject.Genre;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
+@AllArgsConstructor
+@Builder
 public class BookResponse {
 
     private UUID id;
@@ -19,7 +23,6 @@ public class BookResponse {
     private Integer count;
     private int pageCount;
     private boolean isAvailable;
-
 
     private String createdAt;
     private String updatedAt;
