@@ -11,6 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BorrowResponse {
+
     private UUID id;
     private String bookTitle;
     private String userFullName;
