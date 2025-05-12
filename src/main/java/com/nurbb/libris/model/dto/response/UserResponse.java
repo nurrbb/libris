@@ -1,7 +1,7 @@
 package com.nurbb.libris.model.dto.response;
 
-import com.nurbb.libris.model.entity.Level;
-import com.nurbb.libris.model.entity.Role;
+import com.nurbb.libris.model.entity.valueobject.Level;
+import com.nurbb.libris.model.entity.valueobject.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,8 +13,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 public class UserResponse {
+
     private UUID id;
     private String fullName;
     private String email;
