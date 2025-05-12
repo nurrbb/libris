@@ -1,5 +1,6 @@
 package com.nurbb.libris.model.entity;
 
+import com.nurbb.libris.model.entity.valueobject.Genre;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -40,9 +41,4 @@ public class Book extends BaseEntity {
     @Column(name = "is_available", nullable = false)
     private boolean isAvailable = true;
 
-    // Optional: You can still add logic here if needed
-    // @Transient
-    // public Boolean getIsAvailable() {
-    //     return count != null && count > 0 && !Boolean.TRUE.equals(deleted);
-    // }
 }
