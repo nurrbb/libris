@@ -27,35 +27,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.userDetailsService = userDetailsService;
     }
 
+    // These prints were used to trace JWT extraction and validation issues during login development
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
-        System.out.println("Gelen Authorization Header: [" + authHeader + "]");
+
+        // System.out.println("Gelen Authorization Header: [" + authHeader + "]");
 
         if (authHeader != null && authHeader.toLowerCase().startsWith("bearer ")) {
             String token = authHeader.replaceFirst("(?i)^Bearer ", "").trim();
-            System.out.println("Çıkarılan JWT Token: [" + token + "]");
+
+            // System.out.println("Çıkarılan JWT Token: [" + token + "]");
 
             try {
                 String email = jwtUtil.extractUsername(token);
 
-                System.out.println(" E-posta: " + email);
-                System.out.println(" SecurityContext boş mu? " + (SecurityContextHolder.getContext().getAuthentication() == null));
+                // System.out.println(" E-posta: " + email);
+                // System.out.println(" SecurityContext boş mu? " +
+                // (SecurityContextHolder.getContext().getAuthentication() == null));
 
                 if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
                     if (jwtUtil.validateToken(token, userDetails)) {
-                        System.out.println(" Token geçerli");
+                        // System.out.println(" Token geçerli");
 
                         String role = jwtUtil.extractRole(token);
-                        var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role)); // ✅ ROLE_ eklendi
+                        var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
 
-                        System.out.println("JWT'den gelen rol: " + role);
-                        System.out.println("Yetkiler: " + authorities);
+                        // System.out.println("JWT'den gelen rol: " + role);
+                        // System.out.println("Yetkiler: " + authorities);
 
                         UsernamePasswordAuthenticationToken authentication =
                                 new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
@@ -63,15 +68,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     } else {
-                        System.out.println(" Token geçersiz");
+
+                        // System.out.println(" Token geçersiz");
                     }
                 }
 
             } catch (Exception e) {
-                System.out.println(" JWT işleme hatası: " + e.getMessage());
+                // System.out.println(" JWT işleme hatası: " + e.getMessage());
             }
         }
-
         chain.doFilter(request, response);
     }
 }
