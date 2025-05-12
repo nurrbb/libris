@@ -29,8 +29,7 @@ public class Borrow extends BaseEntity {
     @Column(name = "due_date")
     private LocalDate dueDate;
 
-
-    @Column(name = "return_date") //getirme tarihi girilecek mi?
+    @Column(name = "return_date")
     private LocalDate returnDate;
 
     @Column(nullable = false)
