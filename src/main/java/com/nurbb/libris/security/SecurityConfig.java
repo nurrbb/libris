@@ -30,35 +30,24 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
 
-                        // Auth & Swagger
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users/register").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-
-                        // Books
                         .requestMatchers(HttpMethod.GET, "/api/books/**").hasAnyRole("LIBRARIAN", "PATRON", "GUEST")
                         .requestMatchers("/api/books/**").hasRole("LIBRARIAN")
-
-                        // Authors
                         .requestMatchers(HttpMethod.GET, "/api/authors/**").hasAnyRole("LIBRARIAN", "PATRON", "GUEST")
                         .requestMatchers("/api/authors/**").hasRole("LIBRARIAN")
 
-                        // Borrows
                         .requestMatchers("/api/borrows/my-borrows/**").hasRole("PATRON")
                         .requestMatchers("/api/borrows/**").hasRole("LIBRARIAN")
-
-                        // Statistics
                         .requestMatchers("/api/statistics/**").hasRole("LIBRARIAN")
 
-                        // Users
                         .requestMatchers(HttpMethod.GET, "/api/users/{id}", "/api/users/{id}/stats").hasAnyRole("LIBRARIAN", "PATRON")
                         .requestMatchers("/api/users/**").hasRole("LIBRARIAN")
 
-                        // Reactive endpoints
-                        .requestMatchers(HttpMethod.GET, "/api/reactive/books/search").hasAnyRole("LIBRARIAN", "PATRON", "GUEST")
+                        .requestMatchers(HttpMethod.GET, "/api/reactive/books/search").permitAll()
                         .requestMatchers("/api/reactive/books/availability").permitAll()
 
-                        // Diğer her şey: kimlik doğrulama gerekir
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
