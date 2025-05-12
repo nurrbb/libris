@@ -9,6 +9,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookAvailabilityResponse {
+
     private UUID bookId;
     private boolean isAvailable;
     private String title;
