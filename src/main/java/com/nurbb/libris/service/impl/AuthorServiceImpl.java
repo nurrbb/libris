@@ -75,7 +75,7 @@ public class AuthorServiceImpl implements AuthorService {
                 });
     }
 
-// Deletes the author by ID if they have no assigned books (evicts cache)
+// Deletes the author by ID if they have no assigned books (evicts cache).
 
     @CacheEvict(value = { "authorList", "authorById" }, key = "#id")
     @Override
