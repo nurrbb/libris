@@ -1,6 +1,7 @@
 package com.nurbb.libris.controller;
 
 import com.nurbb.libris.model.dto.request.BookRequest;
+import com.nurbb.libris.model.dto.response.BookDeleteResponse;
 import com.nurbb.libris.model.dto.response.BookResponse;
 import com.nurbb.libris.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -136,12 +137,12 @@ public class BookController {
                     @Parameter(name = "id", description = "UUID of the book to delete", required = true)
             },
             responses = {
-                    @ApiResponse(responseCode = "204", description = "Book deleted successfully"),
+                    @ApiResponse(responseCode = "200", description = "Book deleted successfully"),
                     @ApiResponse(responseCode = "404", description = "Book not found")
             }
     )
-    public ResponseEntity<Void> deleteBook(@PathVariable UUID id) {
-        bookService.deleteBook(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<BookDeleteResponse> deleteBook(@PathVariable UUID id) {
+        BookDeleteResponse response = bookService.deleteBook(id);
+        return ResponseEntity.ok(response);
     }
 }

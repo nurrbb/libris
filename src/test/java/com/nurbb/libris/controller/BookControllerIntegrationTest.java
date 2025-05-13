@@ -105,7 +105,7 @@ class BookControllerIntegrationTest {
         String bookId = objectMapper.readTree(created).get("id").asText();
 
         mockMvc.perform(delete("/api/books/" + bookId))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
     }
 
     @Test

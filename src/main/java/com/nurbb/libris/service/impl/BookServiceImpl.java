@@ -4,6 +4,7 @@ import com.nurbb.libris.exception.InvalidRequestException;
 import com.nurbb.libris.exception.NotFoundException;
 import com.nurbb.libris.model.dto.request.BookRequest;
 import com.nurbb.libris.model.dto.response.BookAvailabilityResponse;
+import com.nurbb.libris.model.dto.response.BookDeleteResponse;
 import com.nurbb.libris.model.dto.response.BookResponse;
 import com.nurbb.libris.model.entity.Author;
 import com.nurbb.libris.model.entity.Book;
@@ -182,7 +183,7 @@ public class BookServiceImpl implements BookService {
     @CacheEvict(value = { "bookList", "libraryStatistics", "overdueStats" }, allEntries = true)
     @Override
     @Transactional
-    public void deleteBook(UUID id) {
+    public BookDeleteResponse deleteBook(UUID id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Book not found with id: " + id));
 
@@ -192,11 +193,12 @@ public class BookServiceImpl implements BookService {
             throw new InvalidRequestException("Cannot delete this book. All copies are currently borrowed.");
         }
 
+        int previousCount = book.getCount();
+
         book.setCount(book.getCount() - 1);
         book.setAvailable(book.getCount() > activeBorrows);
-        bookRepository.save(book);
+        Book updated = bookRepository.save(book);
 
-        // Real-time availability update
         bookAvailabilityPublisher.publish(BookAvailabilityResponse.builder()
                 .bookId(book.getId())
                 .isAvailable(book.isAvailable())
@@ -204,8 +206,16 @@ public class BookServiceImpl implements BookService {
                 .build());
 
         log.info("One copy of '{}' deleted. Remaining: {}, Active borrows: {}",
-                book.getTitle(), book.getCount(), activeBorrows);
+                updated.getTitle(), updated.getCount(), activeBorrows);
+
+        return new BookDeleteResponse(
+                updated.getTitle(),
+                previousCount,
+                updated.getCount(),
+                "One copy deleted. Current count: " + updated.getCount()
+        );
     }
+
 /*
  This method was commented out temporarily to avoid redundant manual validation,
  since validation is now expected to be handled globally via @Valid and DTO-level constraints.
