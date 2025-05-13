@@ -51,7 +51,7 @@ public class BorrowController {
     }
 
     @PutMapping("/return/{borrowId}")
-    @PreAuthorize("hasRole('LIBRARIAN')")
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'PATRON')")
     @Operation(
             summary = "Return a borrowed book",
             description = "Marks a borrowed book as returned.",
@@ -86,10 +86,10 @@ public class BorrowController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('LIBRARIAN')")
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'PATRON')")
     @Operation(
             summary = "Get all borrow records",
-            description = "Returns a list of all borrow transactions in the system.",
+            description = "Returns all borrow transactions for librarians. Patrons will only see their own borrow records.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "All borrow records retrieved",
                             content = @Content(array = @ArraySchema(schema = @Schema(implementation = BorrowResponse.class))))

@@ -236,11 +236,21 @@ class BookServiceImplTest {
     @Test
     void shouldDeleteBookSuccessfully() {
         UUID bookId = UUID.randomUUID();
+
+        Book book = new Book();
         book.setId(bookId);
+        book.setTitle("Test Book");
+        book.setIsbn("1234567890");
+        book.setGenre(Genre.SCIENCE);
         book.setCount(3);
+        book.setAvailable(true);
+        book.setAuthor(new Author());
+        book.setPublishedDate(LocalDate.now());
+        book.setPageCount(100);
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(borrowRepository.countByBookIdAndReturnedFalse(bookId)).thenReturn(1L);
+        when(bookRepository.save(any(Book.class))).thenReturn(book);
 
         bookService.deleteBook(bookId);
 
@@ -250,6 +260,8 @@ class BookServiceImplTest {
         verify(bookRepository).save(book);
         verify(availabilityPublisher).publish(any(BookAvailabilityResponse.class));
     }
+
+
 
 
 
