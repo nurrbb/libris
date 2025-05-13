@@ -1,6 +1,7 @@
 package com.nurbb.libris.service;
 
 import com.nurbb.libris.model.dto.request.BookRequest;
+import com.nurbb.libris.model.dto.response.BookDeleteResponse;
 import com.nurbb.libris.model.dto.response.BookResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -21,5 +22,6 @@ public interface BookService {
 
     BookResponse updateBook(UUID id, BookRequest request);
 
-    void deleteBook(UUID id);
+    BookDeleteResponse deleteBook(UUID id);
+
 }
