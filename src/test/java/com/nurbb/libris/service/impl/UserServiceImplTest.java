@@ -17,9 +17,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+
 
 import java.util.*;
 
@@ -102,8 +106,19 @@ class UserServiceImplTest {
         assertThrows(NotFoundException.class, () -> userService.getUserById(userId));
     }
 
+
     @Test
     void getAllUsers_shouldReturnAllMappedUsers() {
+        Authentication auth = mock(Authentication.class);
+        when(auth.getName()).thenReturn("test@user.com");
+        when(auth.getAuthorities()).thenAnswer(invocation ->
+                List.of(new SimpleGrantedAuthority("ROLE_LIBRARIAN"))
+        );
+
+        SecurityContext context = mock(SecurityContext.class);
+        when(context.getAuthentication()).thenReturn(auth);
+        SecurityContextHolder.setContext(context);
+
         List<User> users = List.of(new User(), new User());
         when(userRepository.findAll()).thenReturn(users);
         when(userMapper.toResponse(any())).thenReturn(new UserResponse());
@@ -112,6 +127,8 @@ class UserServiceImplTest {
 
         assertEquals(2, result.size());
     }
+
+
 
     @Test
     void updateUser_shouldUpdateAndReturnUser() {
