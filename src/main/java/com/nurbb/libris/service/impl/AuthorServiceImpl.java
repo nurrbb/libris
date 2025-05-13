@@ -1,6 +1,7 @@
 package com.nurbb.libris.service.impl;
 
 import com.nurbb.libris.exception.InvalidRequestException;
+import com.nurbb.libris.exception.NotFoundException;
 import com.nurbb.libris.model.entity.Author;
 import com.nurbb.libris.repository.AuthorRepository;
 import com.nurbb.libris.service.AuthorService;
@@ -23,7 +24,13 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public Author createAuthor(String name) {
+
+        if (name == null || name.trim().isBlank()) {
+            throw new InvalidRequestException("Author name cannot be empty.");
+        }
+
         String trimmedName = name.trim();
+
         if (authorRepository.existsByNameIgnoreCase(trimmedName)) {
             log.warn("Author creation failed. '{}' already exists.", trimmedName);
             throw new InvalidRequestException("Author with name '" + trimmedName + "' already exists.");
@@ -53,6 +60,11 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public Author getAuthorByNameOrCreate(String name) {
+
+        if (name == null || name.trim().isBlank()) {
+            throw new InvalidRequestException("Author name cannot be empty.");
+        }
+
         String trimmed = name.trim();
         return authorRepository.findByNameIgnoreCase(trimmed)
                 .orElseGet(() -> {
@@ -69,7 +81,7 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public void deleteAuthor(UUID id) {
         Author author = authorRepository.findById(id)
-                .orElseThrow(() -> new InvalidRequestException("Author not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Author not found with id: " + id));
 
         if (!author.getBooks().isEmpty()) {
             throw new InvalidRequestException("Cannot delete author who has books assigned.");
