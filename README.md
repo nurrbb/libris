@@ -87,6 +87,7 @@ Libris is a full-featured library management system built with Spring Boot 3 and
 - Maven
 - Docker (Optional)
 
+
 ### Clone and Run
 
 ```bash
@@ -94,26 +95,69 @@ git clone https://github.com/yourusername/libris.git
 cd libris
 mvn clean install
 mvn spring-boot:run
-## 🐳 Run with Docker
-
-```bash
-docker-compose up --build
 ```
-
-> App runs on `http://localhost:8080`
 
 ---
 
 ## ⚙️ Configuration
 
 - `application.yml` is configured for:
-    - PostgreSQL (`localhost:5432/libris`, user: `postgres`, pass: `12345`)
-    - R2DBC + JPA in separate packages
-    - JWT secret, expiration time
-    - Swagger URL: `http://localhost:8080/swagger-ui/index.html`
+  - PostgreSQL (`localhost:5432/libris`, user: `postgres`, pass: `12345`)
+  - R2DBC + JPA in separate packages
+  - JWT secret, expiration time
+  - Swagger URL: `http://localhost:8080/swagger-ui/index.html`
 
 ---
 
+## 🐳 Docker Usage
+
+This project includes full Docker support for both the backend application and PostgreSQL database.
+
+### 🧩 Requirements
+
+- Docker
+- Docker Compose
+
+### 🧱 Services Overview
+
+- **PostgreSQL Service**
+  - Port: `5432`
+  - Username: `postgres`
+  - Password: `12345`
+  - Database: `libris`
+
+- **Spring Boot App**
+  - Port: `8080`
+  - Reads the jar file from `target/*.jar`
+  - Uses environment variables defined in `docker-compose.yml`
+
+### ▶️ Run the Application with Docker
+
+1. First, package the application:
+
+```bash
+mvn clean package
+```
+
+2. Then start the containers:
+
+```bash
+docker-compose up --build
+```
+
+> Access the app at `http://localhost:8080`  
+> Swagger UI: `http://localhost:8080/swagger-ui/index.html`
+
+### 📁 Docker Files
+
+```
+.
+├── Dockerfile
+├── docker-compose.yml
+├── target/libris.jar
+```
+
+---
 ## 📊 API Endpoints Summary
 
 ### Auth
@@ -175,15 +219,168 @@ docker-compose up --build
 > ✅ = full access, ❌ = no access
 
 ---
-## 🧪 Testing
 
-- Unit and integration test coverage for all services
-- H2 used for isolated in-memory DB testing
-- Swagger-tested via `/swagger-ui`
+## 🎥 API Feature Demonstrations
+
+### 🔐 Authentication
+![Auth](docs/Auth.gif)
+
+### 👤 User Operations
+![User Operations](docs/User_operations.gif)
+
+### 🧾 User Management (Admin)
+![User CRUD](docs/User_CRUD.gif)
+
+### ✍️ Author Management
+![Author CRUD](docs/Author_CRUD.gif)
+
+### 📚 Book Management
+![Book CRUD](docs/Book_CRUD.gif)
+
+### 📥 Borrow & Return
+![Borrow CRUD](docs/Borrow_CRUD.gif)
+
+### 📊 Library Statistics
+![Stats](docs/Stats.gif)
+
+### 🔍 Reactive Book Search
+![Reactive Search](docs/Reactive_Search.gif)
+
+### ♻️ Real-Time Book Availability (Reactive Stream)
+![Reactive Publisher](docs/Reactive_Publisher.gif)
+
+### 📖 Reactive Borrowing
+![Reactive Borrow](docs/Reactive_Borrow.gif)
+
+--
+## 🧪 Test Report
+
+### ✅ Scope
+
+All critical services and controllers have been tested through both unit and integration tests. The focus was on functional correctness, validation, exception handling, access control, and business logic.
+
+### 🧪 Test Types
+
+- **Unit Tests:** Focused on service-layer logic using JUnit + Mockito
+- **Integration Tests:** Full-stack endpoint tests with real request-response flow using H2 in-memory DB
+
+### 🧰 Tools & Environment
+
+- JUnit 5
+- Mockito
+- Spring Boot Test
+- H2 Database (for integration)
+- Swagger UI (for manual test verification)
+
+### ✔️ Tested Classes & Key Scenarios
+
+#### 📚 `BookServiceImplTest`
+- Search, get, update, and delete book operations
+- Handles: not found, duplicate ISBN, no results, active borrows
+- Logging verification and update-without-change check
+
+#### 👤 `UserServiceImplTest`
+- Register, update, delete, and statistics retrieval
+- Validates: role-based restrictions, existence checks, active borrow constraints
+
+#### 📖 `BorrowServiceImplTest`
+- Borrow and return logic with all business rules
+- Validates: late return, borrowing limits, book availability, duplicate borrows
+- Score calculation and librarian-only actions
+
+#### ✍️ `AuthorServiceImplTest`
+- Create, fetch, update, and delete authors
+- Handles: blank/null names, duplicates, cascade delete restrictions
 
 ---
 
+### 🌐 Controller Integration Tests
+
+#### `AuthControllerIntegrationTest`
+- Login and registration flows with valid/invalid credentials
+
+#### `BookControllerIntegrationTest`
+- Full CRUD + search and creation tests with status code verification
+
+#### `UserControllerIntegrationTest`
+- Access control enforcement (403/404 cases)
+- View/update/delete own data, librarian-only access
+
+#### `BorrowControllerIntegrationTest`
+- All borrow-return flows
+- Tests for invalid input, duplicate operations, overdue listings
+
+#### `StatisticsControllerIntegrationTest`
+- Tests statistics endpoint access (valid data, unauthorized access, formatted responses)
+
+#### `AuthorControllerIntegrationTest`
+- Tests CRUD + validation for authors
+- Ensures deletion restriction if books are assigned
+
+#### `StatisticsServiceImplTest`
+- Business logic tests for overdue ratio and borrowing statistics map
+
+---
+
+### 🔁 Execution
+
+- All tests run using:
+```
+bash
+mvn test
+```
+
+---
+
+## 📊 Test Coverage
+
+Test coverage is measured using **JaCoCo** and includes both unit and integration tests.
+
+### ✅ Coverage Summary
+
+- **Instruction Coverage:** 90%
+- **Controller Coverage:** 95%
+- **Service Layer Coverage:** ~93%
+- **Branch Coverage:** 68%
+- **Security & Config Classes:** 97% – 100%
+- **DTOs / Enums / Value Objects:** 100%
+
+> All critical business logic — such as borrowing rules, score system, access control — is covered.
+
+### 📁 Report Location
+
+The full report is available at:
+
+```bash
+/docs/jacoco-report/index.html
+```
+
+To generate the report locally:
+
+```bash
+mvn clean test jacoco:report
+```
+
+Then open:
+
+```
+target/site/jacoco/index.html
+```
+
+To include it in documentation:
+
+```bash
+mkdir -p docs/jacoco-report
+cp -r target/site/jacoco/index.html target/site/jacoco/jacoco-sessions.html docs/jacoco-report/
+```
+
+> The report includes clickable views of all packages, classes, and methods.
+ 
+--
+
 ## 🔄 Postman Collection
+
+[![Postman Collection](https://img.shields.io/badge/Postman-View%20in%20Postman-orange?logo=postman)](https://www.postman.com/nurbulbul/workspace/my-workspace/collection/29027015-e0f3c9f6-96ce-45b7-b904-9fea8996e4d6?action=share&creator=29027015&active-environment=29027015-ad0880b6-b628-43b0-bda7-81f54b310111)
 
 🟢 Pre-configured Postman collection provided under:
 
