@@ -106,13 +106,13 @@ public class AuthorController {
                     @Parameter(name = "id", description = "UUID of the author to delete", required = true)
             },
             responses = {
-                    @ApiResponse(responseCode = "204", description = "Author deleted successfully"),
+                    @ApiResponse(responseCode = "200", description = "Author deleted successfully"),
                     @ApiResponse(responseCode = "404", description = "Author not found")
             }
     )
-    public ResponseEntity<Void> deleteAuthor(@PathVariable UUID id) {
+    public ResponseEntity<String> deleteAuthor(@PathVariable UUID id) {
         authorService.deleteAuthor(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Author deleted successfully.");
     }
 
 }
