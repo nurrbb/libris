@@ -85,7 +85,7 @@ class AuthorControllerIntegrationTest {
         String authorId = objectMapper.readTree(response).get("id").asText();
 
         mockMvc.perform(delete("/api/authors/" + authorId))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
     }
 
     @Test
