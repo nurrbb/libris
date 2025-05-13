@@ -258,16 +258,26 @@ public class BorrowServiceImpl implements BorrowService {
 
     @Override
     public List<BorrowResponse> getAllBorrows() {
-        List<Borrow> borrows = borrowRepository.findAll();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
 
-        if (borrows.isEmpty()) {
-            log.info("No borrow records found.");
+        boolean isLibrarian = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_LIBRARIAN"));
+
+        List<Borrow> borrows;
+
+        if (isLibrarian) {
+            borrows = borrowRepository.findAll();
+        } else {
+            borrows = borrowRepository.findByUserEmail(email);
         }
 
         return borrows.stream()
                 .map(borrowMapper::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
+
+
 
     @Override
     public List<BorrowResponse> getOverdueBorrows() {
