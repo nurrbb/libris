@@ -59,6 +59,9 @@ public class BorrowServiceImpl implements BorrowService {
     @Override
     public BorrowResponse borrowBook(@Valid BorrowRequest request) {
 
+        String userRole = getLoggedInUserRole();
+        validateBorrowDate(request.getBorrowDate(), userRole);
+
         Book book = bookRepository.findById(request.getBookId())
                 .orElseThrow(() -> new NotFoundException("Book not found"));
 
@@ -113,6 +116,8 @@ public class BorrowServiceImpl implements BorrowService {
         book.setCount(book.getCount() - 1);
         book.setAvailable(book.getCount() > 0);
 
+        bookRepository.save(book);
+
         Borrow saved = borrowRepository.save(borrow);
 
         availabilityPublisher.publish(
@@ -145,6 +150,10 @@ public class BorrowServiceImpl implements BorrowService {
     )    @Transactional
     @Override
     public BorrowResponse returnBook(UUID borrowId) {
+
+        String userRole = getLoggedInUserRole();
+        validateReturnDate(LocalDate.now(), userRole);
+
 
         Borrow borrow = borrowRepository.findById(borrowId)
                 .orElseThrow(() -> new NotFoundException("Borrow record not found"));
@@ -247,19 +256,31 @@ public class BorrowServiceImpl implements BorrowService {
                 .collect(Collectors.toList());
     }
 
-
     @Override
     public List<BorrowResponse> getAllBorrows() {
-        return borrowRepository.findAll().stream()
+        List<Borrow> borrows = borrowRepository.findAll();
+
+        if (borrows.isEmpty()) {
+            log.info("No borrow records found.");
+        }
+
+        return borrows.stream()
                 .map(borrowMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<BorrowResponse> getOverdueBorrows() {
-        return borrowRepository.findByReturnedFalseAndDueDateBefore(LocalDate.now()).stream()
+        List<Borrow> borrows = borrowRepository.findByReturnedFalseAndDueDateBefore(LocalDate.now());
+
+        if (borrows.isEmpty()) {
+            log.info("No overdue borrows found.");
+        }
+
+        return borrows.stream()
                 .map(borrowMapper::toResponse)
                 .collect(Collectors.toList());
+
     }
 
     private void checkUserEligibility(User user) {
@@ -281,6 +302,24 @@ public class BorrowServiceImpl implements BorrowService {
         return userRepository.findByEmail(auth.getName())
                 .orElseThrow(() -> new NotFoundException("Authenticated user not found."));
     }
+
+    private void validateBorrowDate(LocalDate borrowDate, String userRole) {
+        if (!userRole.equals("LIBRARIAN") && !borrowDate.equals(LocalDate.now())) {
+            throw new InvalidRequestException("Patrons can only borrow books for today.");
+        }
+    }
+
+    private void validateReturnDate(LocalDate returnDate, String userRole) {
+        if (!userRole.equals("LIBRARIAN") && !returnDate.equals(LocalDate.now())) {
+            throw new InvalidRequestException("Patrons can only return books for today.");
+        }
+    }
+
+    private String getLoggedInUserRole() {
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                .stream().findFirst().get().getAuthority().replace("ROLE_", "");
+    }
+
 
     private boolean isLibrarian(User user) {
         return user.getRole().name().equalsIgnoreCase("LIBRARIAN");
