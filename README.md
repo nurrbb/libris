@@ -209,7 +209,7 @@ Includes grouped folders for:
 - `Genre`: Enum
 - `Level`: Enum (`NOVICE`, `READER`, `BOOKWORM`, `BIBLIOPHILE`)
 
-> Refer to `/docs/schema.png` for the ER diagram.
+![ER Diagram](docs/schema.png)
 
 ---
 
