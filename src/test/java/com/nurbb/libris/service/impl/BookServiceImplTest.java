@@ -249,4 +249,41 @@ class BookServiceImplTest {
         List<BookResponse> responses = bookService.getAllBooks();
         assertEquals(1, responses.size());
     }
+
+    @Test
+    void shouldLogWarningWhenNoBooksFound() {
+        when(bookRepository.findAll()).thenReturn(List.of());
+
+        List<BookResponse> responses = bookService.getAllBooks();
+
+        assertTrue(responses.isEmpty());
+        verify(bookRepository).findAll();
+    }
+
+    @Test
+    void shouldReturnEmptyWhenNoSearchResults() {
+        Page<Book> emptyPage = new PageImpl<>(List.of());
+
+        when(bookRepository.findByTitleContainingIgnoreCase(eq("xyz"), any())).thenReturn(emptyPage);
+        when(bookRepository.findByAuthor_NameContainingIgnoreCase(eq("xyz"), any())).thenReturn(emptyPage);
+        when(bookRepository.findByIsbnContainingIgnoreCase(eq("xyz"), any())).thenReturn(emptyPage);
+
+        Page<BookResponse> result = bookService.searchBooks("xyz", 0, 10);
+
+        assertTrue(result.getContent().isEmpty());
+        assertEquals(0, result.getTotalElements());
+    }
+    @Test
+    void shouldThrowExceptionWhenNoChangesInUpdate() {
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+        when(authorService.getAuthorByNameOrCreate(bookRequest.getAuthorName())).thenReturn(author);
+
+        InvalidRequestException ex = assertThrows(
+                InvalidRequestException.class,
+                () -> bookService.updateBook(bookId, bookRequest)
+        );
+
+        assertEquals("No changes detected. Book is already up-to-date.", ex.getMessage());
+    }
+
 }
