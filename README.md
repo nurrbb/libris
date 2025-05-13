@@ -220,31 +220,52 @@ docker-compose up --build
 
 ---
 ## 🔐 Authentication
-![Auth](docs/ScreenRecords/Auth.gif)
+![Auth](docs/ScreenRecords/Auth.gif)  
+JWT-based login and user authentication.
 
 ## ✍️ Author Management
-![Author CRUD](docs/ScreenRecords/Author_CRUD.gif)
+![Author CRUD](docs/ScreenRecords/Author_CRUD.gif)  
+Create, update, delete, and list authors.
 
 ## 📚 Book Management
-![Book CRUD](docs/ScreenRecords/Book_CRUD.gif)
+![Book CRUD](docs/ScreenRecords/Book_CRUD.gif)  
+Manage books: add, update, delete, and search.
 
 ## 🔁 Borrow & Return
-![Borrow CRUD](docs/ScreenRecords/Borrow_Crud.gif)
+![Borrow CRUD](docs/ScreenRecords/Borrow_Crud.gif)  
+Borrow and return books, and view history.
+
+## 🐳 Docker Integration
+![Docker](docs/ScreenRecords/docker.gif)  
+Run the entire project using Docker containers.
+
+## 🟣 Reactive Borrowing
+![Reactive Borrow](docs/ScreenRecords/Reactive_Borrow.gif)  
+Borrow books reactively using WebFlux.
 
 ## 🟣 Reactive Publisher
-![Reactive Publisher](docs/ScreenRecords/Reactive_Publisher.gif)
+![Reactive Publisher](docs/ScreenRecords/Reactive_Publisher.gif)  
+Publish new books reactively via WebFlux.
 
 ## 🔍 Reactive Search
-![Reactive Search](docs/ScreenRecords/Reactive_Search.gif)
+![Reactive Search](docs/ScreenRecords/Reactive_Search.gif)  
+Search books reactively by title, author, genre, etc.
 
 ## 📈 Statistics
-![Stats](docs/ScreenRecords/Stats.gif)
+![Stats](docs/ScreenRecords/Stats.gif)  
+Display most borrowed books, overdue ratio, and return time stats.
+
+## ✅ Test Coverage
+![Test](docs/ScreenRecords/test.gif)  
+Showcase of successfully running unit and integration tests.
 
 ## 👤 User CRUD
-![User CRUD](docs/ScreenRecords/User_CRUD.gif)
+![User CRUD](docs/ScreenRecords/User_CRUD.gif)  
+Full user management: add, update, delete.
 
 ## 👥 User Operations
-![User operations](docs/ScreenRecords/User_operations.gif)
+![User operations](docs/ScreenRecords/User_operations.gif)  
+User views their profile and borrowing history.
 
 --
 ## 🧪 Test Report
