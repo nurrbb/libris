@@ -33,22 +33,30 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users/register").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
                         .requestMatchers(HttpMethod.GET, "/api/books/**").hasAnyRole("LIBRARIAN", "PATRON", "GUEST")
                         .requestMatchers("/api/books/**").hasRole("LIBRARIAN")
                         .requestMatchers(HttpMethod.GET, "/api/authors/**").hasAnyRole("LIBRARIAN", "PATRON", "GUEST")
                         .requestMatchers("/api/authors/**").hasRole("LIBRARIAN")
 
-                        .requestMatchers("/api/borrows/my-borrows/**").hasRole("PATRON")
+
+                        .requestMatchers(HttpMethod.GET, "/api/borrows").hasAnyRole("LIBRARIAN", "PATRON")
+                        .requestMatchers(HttpMethod.PUT, "/api/borrows/return/**").hasAnyRole("LIBRARIAN", "PATRON")
+
                         .requestMatchers("/api/borrows/**").hasRole("LIBRARIAN")
+
+
                         .requestMatchers("/api/statistics/**").hasRole("LIBRARIAN")
 
+
                         .requestMatchers(HttpMethod.GET, "/api/users/{id}", "/api/users/{id}/stats").hasAnyRole("LIBRARIAN", "PATRON")
-                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("LIBRARIAN")
+                        .requestMatchers(HttpMethod.GET, "/api/users").hasAnyRole("LIBRARIAN", "PATRON")
                         .requestMatchers("/api/users/**").hasRole("LIBRARIAN")
 
 
                         .requestMatchers(HttpMethod.GET, "/api/reactive/books/search").permitAll()
                         .requestMatchers("/api/reactive/books/availability").permitAll()
+
 
                         .anyRequest().authenticated()
                 )
