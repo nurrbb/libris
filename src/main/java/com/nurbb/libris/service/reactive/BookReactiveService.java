@@ -15,7 +15,12 @@ public class BookReactiveService {
     private final BookService bookService;
 
     public Flux<BookResponse> searchBooksReactively(String query, int page, int size) {
-        Page<BookResponse> pageResult = bookService.searchBooks(query, page, size);
-        return Flux.fromIterable(pageResult.getContent());
+        return Flux.defer(() -> {
+            System.out.println("[REACTIVE SEARCH] Query: " + query + ", page: " + page + ", size: " + size);
+            Page<BookResponse> pageResult = bookService.searchBooks(query, page, size);
+            return Flux.fromIterable(pageResult.getContent());
+        });
     }
+
+
 }
