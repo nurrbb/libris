@@ -131,7 +131,8 @@ public class UserController {
                     @Parameter(name = "id", description = "UUID of the user to delete", required = true)
             },
             responses = {
-                    @ApiResponse(responseCode = "204", description = "User deleted successfully"),
+                    @ApiResponse(responseCode = "200", description = "User deleted successfully",
+                            content = @Content(schema = @Schema(implementation = String.class))),
                     @ApiResponse(responseCode = "404", description = "User not found")
             }
     )
