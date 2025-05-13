@@ -1,6 +1,7 @@
 package com.nurbb.libris.service.impl;
 
 import com.nurbb.libris.exception.InvalidRequestException;
+import com.nurbb.libris.exception.NotFoundException;
 import com.nurbb.libris.model.entity.Author;
 import com.nurbb.libris.model.entity.Book;
 import com.nurbb.libris.repository.AuthorRepository;
@@ -129,7 +130,7 @@ class AuthorServiceImplTest {
     void deleteAuthor_shouldThrow_whenAuthorNotFound() {
         when(authorRepository.findById(authorId)).thenReturn(Optional.empty());
 
-        assertThrows(InvalidRequestException.class, () -> authorService.deleteAuthor(authorId));
+        assertThrows(NotFoundException.class, () -> authorService.deleteAuthor(authorId));
     }
 
     @Test
