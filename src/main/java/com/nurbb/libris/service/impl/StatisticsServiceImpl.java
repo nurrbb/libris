@@ -125,26 +125,40 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Cacheable(value = "overdueStats")
     @Override
     public Map<String, Object> getOverdueBookStatistics() {
-        log.info("Generating overdue borrow statistics...");
-        List<Borrow> borrows = borrowRepository.findAll();
+        log.info("Generating detailed overdue borrow report...");
 
-        long totalBorrows = borrows.size();
-        long overdueCount = borrows.stream()
-                .filter(b -> !b.getReturned() && b.getDueDate().isBefore(LocalDate.now()))
-                .count();
+        List<Borrow> overdueBorrows = borrowRepository.findByReturnedFalseAndDueDateBefore(LocalDate.now());
+        long totalOverdue = overdueBorrows.size();
 
-        double overdueRatio = totalBorrows > 0
-                ? (double) overdueCount / totalBorrows
-                : 0;
+        Map<String, Long> overdueByUser = overdueBorrows.stream()
+                .collect(Collectors.groupingBy(b -> b.getUser().getEmail(), Collectors.counting()));
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("totalBorrows", totalBorrows);
-        result.put("overdueBorrows", overdueCount);
-        result.put("overdueRatio", BigDecimal.valueOf(overdueRatio).setScale(2, RoundingMode.HALF_UP));
+        Map<String, Long> overdueByBook = overdueBorrows.stream()
+                .collect(Collectors.groupingBy(b -> b.getBook().getTitle(), Collectors.counting()));
 
-        log.debug("Overdue stats: totalBorrows={}, overdue={}, ratio={}",
-                totalBorrows, overdueCount, overdueRatio);
+        long totalBorrows = borrowRepository.count();
+        double overdueRatio = totalBorrows > 0 ? (double) totalOverdue / totalBorrows : 0;
 
-        return result;
+        List<Map<String, Object>> detailedOverdues = overdueBorrows.stream().map(b -> {
+            Map<String, Object> entry = new HashMap<>();
+            entry.put("user", b.getUser().getEmail());
+            entry.put("book", b.getBook().getTitle());
+            entry.put("borrowDate", b.getBorrowDate());
+            entry.put("dueDate", b.getDueDate());
+            entry.put("daysOverdue", Duration.between(b.getDueDate().atStartOfDay(), LocalDate.now().atStartOfDay()).toDays());
+            return entry;
+        }).toList();
+
+        Map<String, Object> report = new LinkedHashMap<>();
+        report.put("totalBorrows", totalBorrows);
+        report.put("overdueBorrows", totalOverdue);
+        report.put("overdueRatio", BigDecimal.valueOf(overdueRatio).setScale(2, RoundingMode.HALF_UP));
+        report.put("overdueCountByUser", overdueByUser);
+        report.put("overdueCountByBook", overdueByBook);
+        report.put("detailedOverdueEntries", detailedOverdues);
+
+        log.debug("Detailed overdue report generated: {} overdues", totalOverdue);
+        return report;
     }
+
 }
