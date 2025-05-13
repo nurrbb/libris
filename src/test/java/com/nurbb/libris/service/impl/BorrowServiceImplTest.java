@@ -198,4 +198,42 @@ class BorrowServiceImplTest {
         assertThrows(InvalidRequestException.class,
                 () -> borrowService.getBorrowHistoryByUser(otherUserId));
     }
+
+    @Test
+    void borrowBook_shouldThrow_whenPatronTriesPastDate() {
+        user.setRole(Role.PATRON);
+        request.setBorrowDate(LocalDate.now().minusDays(1));
+        request.setDueDate(request.getBorrowDate().plusDays(5));
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new TestingAuthenticationToken(user.getEmail(), "", "ROLE_PATRON")
+        );
+
+
+        lenient().when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        lenient().when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+
+        assertThrows(InvalidRequestException.class, () -> borrowService.borrowBook(request));
+    }
+
+    @Test
+    void borrowBook_shouldSucceed_whenLibrarianBorrowsForPastDate() {
+        user.setRole(Role.LIBRARIAN);
+        request.setBorrowDate(LocalDate.now().minusDays(3));
+        request.setDueDate(request.getBorrowDate().plusDays(5));
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new TestingAuthenticationToken(user.getEmail(), "", "ROLE_LIBRARIAN")
+        );
+
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+        when(borrowRepository.existsByBookAndUserAndReturnedFalse(book, user)).thenReturn(false);
+        when(borrowRepository.findByUser(user)).thenReturn(List.of());
+        when(borrowRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(borrowMapper.toResponse(any())).thenReturn(new BorrowResponse());
+
+        BorrowResponse response = borrowService.borrowBook(request);
+        assertNotNull(response);
+    }
 }
