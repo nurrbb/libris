@@ -3,6 +3,7 @@ package com.nurbb.libris.service.impl;
 import com.nurbb.libris.model.dto.response.LibraryStatisticsResponse;
 import com.nurbb.libris.model.entity.Book;
 import com.nurbb.libris.model.entity.Borrow;
+import com.nurbb.libris.model.entity.User;
 import com.nurbb.libris.model.entity.valueobject.Genre;
 import com.nurbb.libris.repository.BookRepository;
 import com.nurbb.libris.repository.BorrowRepository;
@@ -13,6 +14,7 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -76,14 +78,17 @@ class StatisticsServiceImplTest {
         borrows.add(createBorrow("B", false, LocalDate.now().minusDays(7), LocalDate.now().minusDays(1))); // overdue
         borrows.add(createBorrow("C", false, LocalDate.now().minusDays(2), LocalDate.now().plusDays(3))); // active
 
-        when(borrowRepository.findAll()).thenReturn(borrows);
+        when(borrowRepository.findByReturnedFalseAndDueDateBefore(any(LocalDate.class)))
+                .thenReturn(List.of(borrows.get(1))); // sadece overdue
+        when(borrowRepository.count()).thenReturn(3L);
 
         Map<String, Object> result = statisticsService.getOverdueBookStatistics();
 
         assertEquals(3L, result.get("totalBorrows"));
         assertEquals(1L, result.get("overdueBorrows"));
-        assertEquals(BigDecimal.valueOf(0.33).setScale(2), result.get("overdueRatio"));
+        assertEquals(BigDecimal.valueOf(0.33).setScale(2, RoundingMode.HALF_UP), result.get("overdueRatio"));
     }
+
 
     // === HELPERS ===
 
@@ -94,18 +99,28 @@ class StatisticsServiceImplTest {
         book.setCount(count);
         return book;
     }
-
     private Borrow createBorrow(String bookTitle, boolean returned, LocalDate borrowDate, LocalDate returnOrDueDate) {
         Borrow b = new Borrow();
+
         Book book = new Book();
         book.setTitle(bookTitle);
         book.setGenre(Genre.FANTASY);
         book.setCount(1);
         b.setBook(book);
+
+        User user = new User();
+        user.setEmail(bookTitle.toLowerCase() + "@test.com");
+        b.setUser(user);
+
         b.setBorrowDate(borrowDate);
         b.setReturned(returned);
-        if (returned) b.setReturnDate(returnOrDueDate);
-        else b.setDueDate(returnOrDueDate);
+        if (returned) {
+            b.setReturnDate(returnOrDueDate);
+        } else {
+            b.setDueDate(returnOrDueDate);
+        }
+
         return b;
     }
+
 }
