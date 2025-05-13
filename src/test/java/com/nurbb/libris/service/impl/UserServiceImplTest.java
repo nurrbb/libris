@@ -116,8 +116,15 @@ class UserServiceImplTest {
     @Test
     void updateUser_shouldUpdateAndReturnUser() {
         UserRequest request = new UserRequest("Updated", "new@mail.com", "pass", "123", Role.PATRON);
+
         User user = new User();
         user.setId(userId);
+        user.setEmail("old@mail.com"); // null olmasın
+        user.setFullName("Old Name");
+        user.setPhone("555-000-0000");
+        user.setRole(Role.PATRON);
+        user.setPassword("password123");
+
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userRepository.save(any())).thenReturn(user);
