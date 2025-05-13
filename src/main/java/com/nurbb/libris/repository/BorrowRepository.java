@@ -21,5 +21,8 @@ public interface BorrowRepository extends JpaRepository<Borrow, UUID> {
 
     boolean existsByBookAndUserAndReturnedFalse(Book book, User user);
 
+    List<Borrow> findAllByReturnedFalse();
+
+    List<Borrow> findByUserEmail(String email);
 
 }
