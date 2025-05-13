@@ -219,38 +219,38 @@ docker-compose up --build
 > ✅ = full access, ❌ = no access
 
 ---
-
 ## 🎥 API Feature Demonstrations
 
 ### 🔐 Authentication
-![Auth](docs/Auth.gif)
+![Auth](ScreenRecords/Auth.gif)
 
 ### 👤 User Operations
-![User Operations](docs/User_operations.gif)
+![User Operations](ScreenRecords/User_operations.gif)
 
-### 🧾 User Management (Admin)
-![User CRUD](docs/User_CRUD.gif)
+### 🗂️ User Management (Admin)
+![User CRUD](ScreenRecords/User_CRUD.gif)
 
 ### ✍️ Author Management
-![Author CRUD](docs/Author_CRUD.gif)
+![Author CRUD](ScreenRecords/Author_CRUD.gif)
 
 ### 📚 Book Management
-![Book CRUD](docs/Book_CRUD.gif)
+![Book CRUD](ScreenRecords/Book_CRUD.gif)
 
-### 📥 Borrow & Return
-![Borrow CRUD](docs/Borrow_CRUD.gif)
+### 🔁 Borrow & Return
+![Borrow CRUD](ScreenRecords/Borrow_Crud.gif)
 
-### 📊 Library Statistics
-![Stats](docs/Stats.gif)
+### 📈 Library Statistics
+![Stats](ScreenRecords/Stats.gif)
 
-### 🔍 Reactive Book Search
-![Reactive Search](docs/Reactive_Search.gif)
+### 🌐 Reactive Features
+#### 🔎 Reactive Search
+![Reactive Search](ScreenRecords/Reactive_Search.gif)
 
-### ♻️ Real-Time Book Availability (Reactive Stream)
-![Reactive Publisher](docs/Reactive_Publisher.gif)
+#### 📡 Availability Publisher (WebFlux SSE)
+![Reactive Publisher](ScreenRecords/Reactive_Publisher.gif)
 
-### 📖 Reactive Borrowing
-![Reactive Borrow](docs/Reactive_Borrow.gif)
+#### 🔁 Reactive Borrow Flow
+![Reactive Borrow](ScreenRecords/Reactive_Borrow.gif)
 
 --
 ## 🧪 Test Report
