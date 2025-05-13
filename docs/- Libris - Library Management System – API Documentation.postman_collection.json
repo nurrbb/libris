@@ -1,0 +1,2434 @@
+{
+	"info": {
+		"_postman_id": "e0f3c9f6-96ce-45b7-b904-9fea8996e4d6",
+		"name": "\" Libris \" Library Management System – API Documentation",
+		"description": "This document outlines all essential API endpoints of the Libris project, including authentication, book operations, borrowing/returning workflows, user statistics, and reactive (WebFlux) capabilities.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29027015",
+		"_collection_link": "https://www.postman.com/nurbulbul/workspace/my-workspace/collection/29027015-e0f3c9f6-96ce-45b7-b904-9fea8996e4d6?action=share&source=collection_link&creator=29027015"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "  {\"email\": \"admin@libris.com\",\r\n  \"password\": \"admin123\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Authenticate a user using email and password. On success, returns a JWT token used to authorize secured requests across the API."
+					},
+					"response": [
+						{
+							"name": "Login - Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"email\": \"admin@libris.com\",\r\n  \"password\": \"admin123\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/auth/login",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n    \"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzA3Mzc2NCwiZXhwIjoxNzQ3MDc3MzY0fQ.4EOtveCEWBUcY3AQ93jADqmWG6V_XsFHm_wVZOKSSoc\"\r\n}"
+						}
+					]
+				}
+			],
+			"description": "Handles user authentication and JWT token generation."
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Create user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"fullName\": \"Elif Yıldız\",\r\n  \"email\": \"elif.yildiz@example.com\",\r\n  \"phone\": \"555-100-0020\",\r\n  \"password\": \"securePassword123\",\r\n  \"role\": \"PATRON\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/users/register?Content-Type\t=application/json",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								"register"
+							],
+							"query": [
+								{
+									"key": "Content-Type\t",
+									"value": "application/json"
+								}
+							]
+						},
+						"description": "Registers a new user (PATRON or LIBRARIAN) by providing their personal details."
+					},
+					"response": [
+						{
+							"name": "create user",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"fullName\": \"Alice Morgan\",\r\n    \"email\": \"alice.morgan@example.com\",\r\n    \"password\": \"Password123!\",\r\n    \"phone\": \"555-100-0001\",\r\n    \"role\": \"GUEST\"\r\n  }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/users/register?Content-Type\t=application/json",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"users",
+										"register"
+									],
+									"query": [
+										{
+											"key": "Content-Type\t",
+											"value": "application/json"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": "{\r\n    \"id\": \"1469809b-5ced-41b5-9cf0-f02fd8a14320\",\r\n    \"fullName\": \"Alice Morgan\",\r\n    \"email\": \"alice.morgan@example.com\",\r\n    \"phone\": \"555-100-0001\",\r\n    \"role\": \"PATRON\",\r\n    \"score\": 0,\r\n    \"level\": \"NOVICE\",\r\n    \"totalPagesRead\": 0,\r\n    \"totalReadingDays\": 0,\r\n    \"totalReturnedBooks\": 0,\r\n    \"totalLateReturns\": 0,\r\n    \"currentStreakTimelyReturns\": 0,\r\n    \"deleted\": false,\r\n    \"createdAt\": \"2025-05-12T22:29:51.944020600\",\r\n    \"updatedAt\": \"2025-05-12T22:29:51.955893100\"\r\n}"
+						}
+					]
+				},
+				{
+					"name": "Update user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEyODQzNCwiZXhwIjoxNzQ3MTMyMDM0fQ.UEQe-WBvucxiYiVMdYfeQJ3IKoGBZXPwJ0n-e_JG-bM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"fullName\": \"Hande Özdemir\",\r\n  \"email\": \"hande.ozdemir@example.com\",\r\n  \"password\": \"newSecurePass123\",\r\n  \"phone\": \"555-999-0000\",\r\n  \"role\": \"PATRON\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/users/0f41fb13-7efc-47c4-808d-5aba7d99979c",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								"0f41fb13-7efc-47c4-808d-5aba7d99979c"
+							]
+						},
+						"description": "Updates an existing user's information. Only accessible by authorized roles."
+					},
+					"response": [
+						{
+							"name": "Update No Change",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"fullName\": \"Hande Özdemir\",\r\n  \"email\": \"hande.ozdemir@example.com\",\r\n  \"password\": \"newSecurePass123\",\r\n  \"phone\": \"555-999-0000\",\r\n  \"role\": \"PATRON\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/users/0f41fb13-7efc-47c4-808d-5aba7d99979c",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"users",
+										"0f41fb13-7efc-47c4-808d-5aba7d99979c"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": "{\r\n    \"timestamp\": \"2025-05-13T13:25:01.5177364\",\r\n    \"status\": 400,\r\n    \"error\": \"Bad Request\",\r\n    \"message\": \"No changes detected. User data is already up-to-date.\"\r\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEyODQzNCwiZXhwIjoxNzQ3MTMyMDM0fQ.UEQe-WBvucxiYiVMdYfeQJ3IKoGBZXPwJ0n-e_JG-bM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users/4a462a63-fdec-4e4f-b3b7-e2e4aecff8fc",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								"4a462a63-fdec-4e4f-b3b7-e2e4aecff8fc"
+							]
+						},
+						"description": "Performs a soft delete on a user. The record remains in the database but is marked as deleted."
+					},
+					"response": [
+						{
+							"name": "Delete - Not Found ID",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/users/03b79284-8918-49d8-923a-e23ae831e213",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"users",
+										"03b79284-8918-49d8-923a-e23ae831e213"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n    \"timestamp\": \"2025-05-12T23:10:09.2232384\",\r\n    \"status\": 404,\r\n    \"error\": \"Not Found\",\r\n    \"message\": \"User not found with id: 03b79284-8918-49d8-923a-e23ae831e213 not found!\"\r\n}"
+						}
+					]
+				},
+				{
+					"name": "Get User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEyODQzNCwiZXhwIjoxNzQ3MTMyMDM0fQ.UEQe-WBvucxiYiVMdYfeQJ3IKoGBZXPwJ0n-e_JG-bM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Fetches user details by ID. Returns basic user profile information including role and current stats."
+					},
+					"response": [
+						{
+							"name": "Get All Users",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/users",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "[\r\n    {\r\n        \"id\": \"2a6a432c-b3fe-4518-90c7-b96d2c1280b4\",\r\n        \"fullName\": \"System Admin\",\r\n        \"email\": \"admin@libris.com\",\r\n        \"phone\": null,\r\n        \"role\": \"LIBRARIAN\",\r\n        \"score\": 0,\r\n        \"level\": \"NOVICE\",\r\n        \"totalPagesRead\": 0,\r\n        \"totalReadingDays\": 0,\r\n        \"totalReturnedBooks\": 0,\r\n        \"totalLateReturns\": 0,\r\n        \"currentStreakTimelyReturns\": 0,\r\n        \"deleted\": false,\r\n        \"createdAt\": \"2025-05-12T11:11:40.498286\",\r\n        \"updatedAt\": \"2025-05-12T11:11:40.516407\"\r\n    },\r\n    {\r\n        \"id\": \"f4fc2401-522a-4446-a678-a9d8f7a6e6d9\",\r\n        \"fullName\": \"Test User\",\r\n        \"email\": \"test@user.com\",\r\n        \"phone\": null,\r\n        \"role\": \"PATRON\",\r\n        \"score\": 0,\r\n        \"level\": \"NOVICE\",\r\n        \"totalPagesRead\": 0,\r\n        \"totalReadingDays\": 0,\r\n        \"totalReturnedBooks\": 0,\r\n        \"totalLateReturns\": 0,\r\n        \"currentStreakTimelyReturns\": 0,\r\n        \"deleted\": false,\r\n        \"createdAt\": \"2025-05-12T11:24:21.100431\",\r\n        \"updatedAt\": \"2025-05-12T11:24:21.100431\"\r\n    },\r\n    {\r\n        \"id\": \"4a462a63-fdec-4e4f-b3b7-e2e4aecff8fc\",\r\n        \"fullName\": \"Patron User\",\r\n        \"email\": \"patron1@libris.com\",\r\n        \"phone\": null,\r\n        \"role\": \"PATRON\",\r\n        \"score\": 0,\r\n        \"level\": \"NOVICE\",\r\n        \"totalPagesRead\": 0,\r\n        \"totalReadingDays\": 0,\r\n        \"totalReturnedBooks\": 0,\r\n        \"totalLateReturns\": 0,\r\n        \"currentStreakTimelyReturns\": 0,\r\n        \"deleted\": false,\r\n        \"createdAt\": \"2025-05-12T11:30:46.393952\",\r\n        \"updatedAt\": \"2025-05-12T11:30:46.394966\"\r\n    },\r\n    {\r\n        \"id\": \"49b80b87-dcd1-4372-b4f7-4e7d06654d8f\",\r\n        \"fullName\": \"Second Librarian\",\r\n        \"email\": \"lib2@libris.com\",\r\n        \"phone\": null,\r\n        \"role\": \"LIBRARIAN\",\r\n        \"score\": 0,\r\n        \"level\": \"NOVICE\",\r\n        \"totalPagesRead\": 0,\r\n        \"totalReadingDays\": 0,\r\n        \"totalReturnedBooks\": 0,\r\n        \"totalLateReturns\": 0,\r\n        \"currentStreakTimelyReturns\": 0,\r\n        \"deleted\": false,\r\n        \"createdAt\": \"2025-05-12T11:30:57.813938\",\r\n        \"updatedAt\": \"2025-05-12T11:30:57.813938\"\r\n    },\r\n    {\r\n        \"id\": \"1469809b-5ced-41b5-9cf0-f02fd8a14320\",\r\n        \"fullName\": \"Alice Morgan\",\r\n        \"email\": \"alice.morgan@example.com\",\r\n        \"phone\": \"555-100-0001\",\r\n        \"role\": \"PATRON\",\r\n        \"score\": 0,\r\n        \"level\": \"NOVICE\",\r\n        \"totalPagesRead\": 0,\r\n        \"totalReadingDays\": 0,\r\n        \"totalReturnedBooks\": 0,\r\n        \"totalLateReturns\": 0,\r\n        \"currentStreakTimelyReturns\": 0,\r\n        \"deleted\": false,\r\n        \"createdAt\": \"2025-05-12T22:29:51.944021\",\r\n        \"updatedAt\": \"2025-05-12T22:29:51.955893\"\r\n    },\r\n    {\r\n        \"id\": \"b2a9db3b-80d5-416d-add6-9c3ddfeb7ba4\",\r\n        \"fullName\": \"Deniz Kaya\",\r\n        \"email\": \"deniz.kaya@example.com\",\r\n        \"phone\": \"555-100-0004\",\r\n        \"role\": \"PATRON\",\r\n        \"score\": 0,\r\n        \"level\": \"NOVICE\",\r\n        \"totalPagesRead\": 0,\r\n        \"totalReadingDays\": 0,\r\n        \"totalReturnedBooks\": 0,\r\n        \"totalLateReturns\": 0,\r\n        \"currentStreakTimelyReturns\": 0,\r\n        \"deleted\": false,\r\n        \"createdAt\": \"2025-05-12T22:30:25.477542\",\r\n        \"updatedAt\": \"2025-05-12T22:30:25.478124\"\r\n    },\r\n    {\r\n        \"id\": \"55a97fe1-4b61-4037-abb3-f1f5e695da83\",\r\n        \"fullName\": \"Ethan Clarke\",\r\n        \"email\": \"ethan.clarke@example.com\",\r\n        \"phone\": \"555-100-0005\",\r\n        \"role\": \"PATRON\",\r\n        \"score\": 0,\r\n        \"level\": \"NOVICE\",\r\n        \"totalPagesRead\": 0,\r\n        \"totalReadingDays\": 0,\r\n        \"totalReturnedBooks\": 0,\r\n        \"totalLateReturns\": 0,\r\n        \"currentStreakTimelyReturns\": 0,\r\n        \"deleted\": false,\r\n        \"createdAt\": \"2025-05-12T22:30:33.049818\",\r\n        \"updatedAt\": \"2025-05-12T22:30:33.049818\"\r\n    },\r\n    {\r\n        \"id\": \"03b79284-8918-49d8-923a-e23ae831e21c\",\r\n        \"fullName\": \"Fatma Demir\",\r\n        \"email\": \"fatma.demir@example.com\",\r\n        \"phone\": \"555-100-0006\",\r\n        \"role\": \"PATRON\",\r\n        \"score\": 0,\r\n        \"level\": \"NOVICE\",\r\n        \"totalPagesRead\": 0,\r\n        \"totalReadingDays\": 0,\r\n        \"totalReturnedBooks\": 0,\r\n        \"totalLateReturns\": 0,\r\n        \"currentStreakTimelyReturns\": 0,\r\n        \"deleted\": false,\r\n        \"createdAt\": \"2025-05-12T22:30:41.820900\",\r\n        \"updatedAt\": \"2025-05-12T22:30:41.820900\"\r\n    },\r\n    {\r\n        \"id\": \"0f41fb13-7efc-47c4-808d-5aba7d99979c\",\r\n        \"fullName\": \"Hande Özdemir\",\r\n        \"email\": \"hande.ozdemir@example.com\",\r\n        \"phone\": \"555-100-0008\",\r\n        \"role\": \"PATRON\",\r\n        \"score\": 0,\r\n        \"level\": \"NOVICE\",\r\n        \"totalPagesRead\": 0,\r\n        \"totalReadingDays\": 0,\r\n        \"totalReturnedBooks\": 0,\r\n        \"totalLateReturns\": 0,\r\n        \"currentStreakTimelyReturns\": 0,\r\n        \"deleted\": false,\r\n        \"createdAt\": \"2025-05-12T22:30:50.290638\",\r\n        \"updatedAt\": \"2025-05-12T22:30:50.290638\"\r\n    },\r\n    {\r\n        \"id\": \"44435e7c-c463-44bf-9c3e-539c5ad624b4\",\r\n        \"fullName\": \"George Harris\",\r\n        \"email\": \"george.harris@example.com\",\r\n        \"phone\": \"555-100-0007\",\r\n        \"role\": \"PATRON\",\r\n        \"score\": 0,\r\n        \"level\": \"NOVICE\",\r\n        \"totalPagesRead\": 0,\r\n        \"totalReadingDays\": 0,\r\n        \"totalReturnedBooks\": 0,\r\n        \"totalLateReturns\": 0,\r\n        \"currentStreakTimelyReturns\": 0,\r\n        \"deleted\": false,\r\n        \"createdAt\": \"2025-05-12T22:31:02.387606\",\r\n        \"updatedAt\": \"2025-05-12T22:31:02.388607\"\r\n    }\r\n]"
+						}
+					]
+				},
+				{
+					"name": "Get User By Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEyODQzNCwiZXhwIjoxNzQ3MTMyMDM0fQ.UEQe-WBvucxiYiVMdYfeQJ3IKoGBZXPwJ0n-e_JG-bM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users/1469809b-5ced-41b5-9cf0-f02fd8a14320",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								"1469809b-5ced-41b5-9cf0-f02fd8a14320"
+							]
+						},
+						"description": "Retrieves the details of a specific user by their unique ID."
+					},
+					"response": [
+						{
+							"name": "Get user By ID",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/users/1469809b-5ced-41b5-9cf0-f02fd8a14320",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"users",
+										"1469809b-5ced-41b5-9cf0-f02fd8a14320"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n    \"id\": \"1469809b-5ced-41b5-9cf0-f02fd8a14320\",\r\n    \"fullName\": \"Alice Morgan\",\r\n    \"email\": \"alice.morgan@example.com\",\r\n    \"phone\": \"555-100-0001\",\r\n    \"role\": \"PATRON\",\r\n    \"score\": 0,\r\n    \"level\": \"NOVICE\",\r\n    \"totalPagesRead\": 0,\r\n    \"totalReadingDays\": 0,\r\n    \"totalReturnedBooks\": 0,\r\n    \"totalLateReturns\": 0,\r\n    \"currentStreakTimelyReturns\": 0,\r\n    \"deleted\": false,\r\n    \"createdAt\": \"2025-05-12T22:29:51.944021\",\r\n    \"updatedAt\": \"2025-05-12T22:29:51.955893\"\r\n}"
+						}
+					]
+				},
+				{
+					"name": "Get User Stats",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEyODQzNCwiZXhwIjoxNzQ3MTMyMDM0fQ.UEQe-WBvucxiYiVMdYfeQJ3IKoGBZXPwJ0n-e_JG-bM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users/0f41fb13-7efc-47c4-808d-5aba7d99979c/stats",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								"0f41fb13-7efc-47c4-808d-5aba7d99979c",
+								"stats"
+							]
+						},
+						"description": "Retrieves detailed reading statistics for the user."
+					},
+					"response": [
+						{
+							"name": "Get User Statistics By ID",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/users/1469809b-5ced-41b5-9cf0-f02fd8a14320/stats",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"users",
+										"1469809b-5ced-41b5-9cf0-f02fd8a14320",
+										"stats"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n    \"email\": \"alice.morgan@example.com\",\r\n    \"level\": \"NOVICE\",\r\n    \"score\": -8,\r\n    \"totalBorrowedBooks\": 2,\r\n    \"totalReturnedBooks\": 2,\r\n    \"totalLateReturns\": 2,\r\n    \"totalReadingDays\": 49,\r\n    \"totalReadPages\": 606,\r\n    \"avgPagesPerDay\": 12.37,\r\n    \"avgReturnDuration\": 24.5\r\n}"
+						}
+					]
+				}
+			],
+			"description": "Manage users in the Libris system, including registration and profile-related operations."
+		},
+		{
+			"name": "Book",
+			"item": [
+				{
+					"name": "Add New Book",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEyNjQ3MSwiZXhwIjoxNzQ3MTMwMDcxfQ.LzX1gwguoDKtI3Tuo7_J-xou2yLcSfo59mGmQq7atmo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Sapiens\",\r\n  \"authorName\": \"Yuval Noah Harari\",\r\n  \"isbn\": \"9780062316097\",\r\n  \"publishedDate\": \"2015-02-10\",\r\n  \"genre\": \"HISTORY\",\r\n  \"pageCount\": 498,\r\n  \"count\": 5\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/books?Content-Type=application/json",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"books"
+							],
+							"query": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							]
+						},
+						"description": "Adds a new book to the library collection with required fields such as title, author, ISBN, genre, and page count."
+					},
+					"response": [
+						{
+							"name": "Add New Book - Failed",
+							"originalRequest": {
+								"method": "GET",
+								"header": []
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Get Books",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEzMjIwOSwiZXhwIjoxNzQ3MTM1ODA5fQ.h0l-6ydsYYjYx2WtbsOrIhRs2XIkwL0ObXbr6n7VYzs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/books",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"books"
+							]
+						},
+						"description": "Retrieves a list of all books or performs a filtered search based on title, author, or ISBN. Supports pagination."
+					},
+					"response": [
+						{
+							"name": "Get All Books - Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/books/search?query=Harry&page=0&size=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"books",
+										"search"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "Harry"
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "[\r\n    {\r\n        \"id\": \"71210dd1-7fa9-4b9c-a60d-908a51d19926\",\r\n        \"title\": \"1984\",\r\n        \"authorName\": \"George Orwell\",\r\n        \"isbn\": \"9780451524935\",\r\n        \"publishedDate\": \"1949-06-08\",\r\n        \"genre\": \"FICTION\",\r\n        \"count\": 3,\r\n        \"pageCount\": 328,\r\n        \"createdAt\": \"2025-05-12T21:25:32.189908\",\r\n        \"updatedAt\": \"2025-05-12T21:25:32.226288\",\r\n        \"available\": false\r\n    },\r\n    {\r\n        \"id\": \"28c52a19-e3f0-40c1-bef5-59d7150ec176\",\r\n        \"title\": \"Animal Farm\",\r\n        \"authorName\": \"George Orwell\",\r\n        \"isbn\": \"9780451526342\",\r\n        \"publishedDate\": \"1945-08-17\",\r\n        \"genre\": \"FICTION\",\r\n        \"count\": 8,\r\n        \"pageCount\": 112,\r\n        \"createdAt\": \"2025-05-12T21:26:10.262639\",\r\n        \"updatedAt\": \"2025-05-12T21:26:10.262639\",\r\n        \"available\": false\r\n    },\r\n    {\r\n        \"id\": \"32f2df6c-436c-4d27-82a8-568885ab070c\",\r\n        \"title\": \"Harry Potter and the Philosopher's Stone\",\r\n        \"authorName\": \"J.K. Rowling\",\r\n        \"isbn\": \"9780747532699\",\r\n        \"publishedDate\": \"1997-06-26\",\r\n        \"genre\": \"FICTION\",\r\n        \"count\": 15,\r\n        \"pageCount\": 223,\r\n        \"createdAt\": \"2025-05-12T21:26:19.929112\",\r\n        \"updatedAt\": \"2025-05-12T21:26:19.931126\",\r\n        \"available\": false\r\n    },\r\n    {\r\n        \"id\": \"2bfe1528-f5f0-4450-b5a9-b7de8fe2b951\",\r\n        \"title\": \"Harry Potter and the Chamber of Secrets\",\r\n        \"authorName\": \"J.K. Rowling\",\r\n        \"isbn\": \"9780747538493\",\r\n        \"publishedDate\": \"1998-07-02\",\r\n        \"genre\": \"FICTION\",\r\n        \"count\": 4,\r\n        \"pageCount\": 251,\r\n        \"createdAt\": \"2025-05-12T21:26:28.640321\",\r\n        \"updatedAt\": \"2025-05-12T21:26:28.640321\",\r\n        \"available\": false\r\n    },\r\n    {\r\n        \"id\": \"f5430ed4-dc85-4cdc-8ebd-dc50dc5c2cdb\",\r\n        \"title\": \"The Shining\",\r\n        \"authorName\": \"Stephen King\",\r\n        \"isbn\": \"9780385121675\",\r\n        \"publishedDate\": \"1977-01-28\",\r\n        \"genre\": \"FICTION\",\r\n        \"count\": 5,\r\n        \"pageCount\": 447,\r\n        \"createdAt\": \"2025-05-12T21:26:45.971578\",\r\n        \"updatedAt\": \"2025-05-12T21:26:45.972583\",\r\n        \"available\": false\r\n    },\r\n    {\r\n        \"id\": \"7379d769-ba02-42a6-a6ed-8f209ed9f96c\",\r\n        \"title\": \"The Stand\",\r\n        \"authorName\": \"Stephen King\",\r\n        \"isbn\": \"9780385121682\",\r\n        \"publishedDate\": \"1978-10-03\",\r\n        \"genre\": \"FICTION\",\r\n        \"count\": 2,\r\n        \"pageCount\": 823,\r\n        \"createdAt\": \"2025-05-12T21:27:01.966355\",\r\n        \"updatedAt\": \"2025-05-12T21:27:01.966355\",\r\n        \"available\": false\r\n    },\r\n    {\r\n        \"id\": \"4e6a98c2-8fa2-4451-a304-a5c1d0963a7f\",\r\n        \"title\": \"Murder on the Orient Express\",\r\n        \"authorName\": \"Agatha Christie\",\r\n        \"isbn\": \"9780007119318\",\r\n        \"publishedDate\": \"1934-01-01\",\r\n        \"genre\": \"FICTION\",\r\n        \"count\": 2,\r\n        \"pageCount\": 256,\r\n        \"createdAt\": \"2025-05-12T21:27:14.068316\",\r\n        \"updatedAt\": \"2025-05-12T21:27:14.068316\",\r\n        \"available\": false\r\n    },\r\n    {\r\n        \"id\": \"9cb2c4f4-fd5e-41b6-8bb9-f29dcc3c4004\",\r\n        \"title\": \"And Then There Were None\",\r\n        \"authorName\": \"Agatha Christie\",\r\n        \"isbn\": \"9780062073488\",\r\n        \"publishedDate\": \"1939-11-06\",\r\n        \"genre\": \"FICTION\",\r\n        \"count\": 2,\r\n        \"pageCount\": 272,\r\n        \"createdAt\": \"2025-05-12T21:27:26.239136\",\r\n        \"updatedAt\": \"2025-05-12T21:27:26.239136\",\r\n        \"available\": false\r\n    },\r\n    {\r\n        \"id\": \"168559ee-6e7a-4cbc-a1a6-530d43e9bc0e\",\r\n        \"title\": \"Sense and Sensibility\",\r\n        \"authorName\": \"Jane Austen\",\r\n        \"isbn\": \"9780141439662\",\r\n        \"publishedDate\": \"1811-10-30\",\r\n        \"genre\": \"FICTION\",\r\n        \"count\": 6,\r\n        \"pageCount\": 409,\r\n        \"createdAt\": \"2025-05-12T21:27:37.718466\",\r\n        \"updatedAt\": \"2025-05-12T21:27:37.718466\",\r\n        \"available\": false\r\n    },\r\n    {\r\n        \"id\": \"c4a0e505-edfe-4b18-97c3-0dad8dc9b99b\",\r\n        \"title\": \"Pride and Prejudice\",\r\n        \"authorName\": \"Jane Austen\",\r\n        \"isbn\": \"9781503290563\",\r\n        \"publishedDate\": \"1813-01-28\",\r\n        \"genre\": \"FICTION\",\r\n        \"count\": 10,\r\n        \"pageCount\": 279,\r\n        \"createdAt\": \"2025-05-12T21:27:46.774584\",\r\n        \"updatedAt\": \"2025-05-12T21:27:46.774584\",\r\n        \"available\": false\r\n    }\r\n]"
+						}
+					]
+				},
+				{
+					"name": "Delete Book",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEyNjQ3MSwiZXhwIjoxNzQ3MTMwMDcxfQ.LzX1gwguoDKtI3Tuo7_J-xou2yLcSfo59mGmQq7atmo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/books/f5430ed4-dc85-4cdc-8ebd-dc50dc5c2cdb",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"books",
+								"f5430ed4-dc85-4cdc-8ebd-dc50dc5c2cdb"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Marks a book as deleted (soft delete). It will no longer appear in public listings but remains in the system for audit purposes."
+					},
+					"response": [
+						{
+							"name": "Delete Book - Not Found",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/api/books/f5430ed4-dc85-4cdc-8ebd-dc50dc5c2cdk",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"books",
+										"f5430ed4-dc85-4cdc-8ebd-dc50dc5c2cdk"
+									],
+									"query": [
+										{
+											"key": "Content-Type",
+											"value": "application/json",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n    \"timestamp\": \"2025-05-13T12:29:52.7211443\",\r\n    \"status\": 404,\r\n    \"error\": \"Not Found\",\r\n    \"message\": \"Book not found with id: f5430ed4-dc85-4cdc-8ebd-dc50dc5c2cd4 not found!\"\r\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Book",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEyNjQ3MSwiZXhwIjoxNzQ3MTMwMDcxfQ.LzX1gwguoDKtI3Tuo7_J-xou2yLcSfo59mGmQq7atmo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"title\": \"Murder on the Orient Express\",\r\n        \"authorName\": \"Agatha Christie\",\r\n        \"isbn\": \"9780007119318\",\r\n        \"publishedDate\": \"1934-01-01\",\r\n        \"genre\": \"FICTION\",\r\n        \"count\": 2,\r\n        \"pageCount\": 260\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/books/4e6a98c2-8fa2-4451-a304-a5c1d0963a7f",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"books",
+								"4e6a98c2-8fa2-4451-a304-a5c1d0963a7f"
+							]
+						},
+						"description": "Updates information about a specific book. Only LIBRARIAN or MANAGER roles can perform this operation."
+					},
+					"response": [
+						{
+							"name": "Update Book",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": " {\r\n        \"id\": \"2bfe1528-f5f0-4450-b5a9-b7de8fe2b951\",\r\n        \"title\": \"Harry Potter and the Chamber of Secrets\",\r\n        \"authorName\": \"J.K. Rowling\",\r\n        \"isbn\": \"9780747538493\",\r\n        \"publishedDate\": \"1998-07-02\",\r\n        \"genre\": \"FICTION\",\r\n        \"count\": 4,\r\n        \"pageCount\": 278,\r\n        \"createdAt\": \"2025-05-12T21:26:28.640321\",\r\n        \"updatedAt\": \"2025-05-12T21:26:28.640321\",\r\n        \"available\": false\r\n    },",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/books/2bfe1528-f5f0-4450-b5a9-b7de8fe2b951",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"books",
+										"2bfe1528-f5f0-4450-b5a9-b7de8fe2b951"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": "{\r\n    \"id\": \"2bfe1528-f5f0-4450-b5a9-b7de8fe2b951\",\r\n    \"title\": \"Harry Potter and the Chamber of Secrets\",\r\n    \"authorName\": \"J.K. Rowling\",\r\n    \"isbn\": \"9780747538493\",\r\n    \"publishedDate\": \"1998-07-02\",\r\n    \"genre\": \"FICTION\",\r\n    \"count\": 4,\r\n    \"pageCount\": 278,\r\n    \"createdAt\": \"2025-05-12T21:26:28.640321\",\r\n    \"updatedAt\": \"2025-05-12T21:26:28.640321\",\r\n    \"available\": false\r\n}"
+						}
+					]
+				},
+				{
+					"name": "Search Book By Title",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEyNjQ3MSwiZXhwIjoxNzQ3MTMwMDcxfQ.LzX1gwguoDKtI3Tuo7_J-xou2yLcSfo59mGmQq7atmo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/books/search?query=Sapiens&page=0&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"books",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "Sapiens"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Searches books by title keyword (case-insensitive)."
+					},
+					"response": [
+						{
+							"name": "Get Book By Title",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/books/search?query=Harry&page=0&size=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"books",
+										"search"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "Harry"
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": "{\r\n    \"content\": [\r\n        {\r\n            \"id\": \"32f2df6c-436c-4d27-82a8-568885ab070c\",\r\n            \"title\": \"Harry Potter and the Philosopher's Stone\",\r\n            \"authorName\": \"J.K. Rowling\",\r\n            \"isbn\": \"9780747532699\",\r\n            \"publishedDate\": \"1997-06-26\",\r\n            \"genre\": \"FICTION\",\r\n            \"count\": 15,\r\n            \"pageCount\": 223,\r\n            \"createdAt\": \"2025-05-12T21:26:19.929112\",\r\n            \"updatedAt\": \"2025-05-12T21:26:19.931126\",\r\n            \"available\": false\r\n        },\r\n        {\r\n            \"id\": \"2bfe1528-f5f0-4450-b5a9-b7de8fe2b951\",\r\n            \"title\": \"Harry Potter and the Chamber of Secrets\",\r\n            \"authorName\": \"J.K. Rowling\",\r\n            \"isbn\": \"9780747538493\",\r\n            \"publishedDate\": \"1998-07-02\",\r\n            \"genre\": \"FICTION\",\r\n            \"count\": 4,\r\n            \"pageCount\": 278,\r\n            \"createdAt\": \"2025-05-12T21:26:28.640321\",\r\n            \"updatedAt\": \"2025-05-12T21:55:58.851266\",\r\n            \"available\": false\r\n        }\r\n    ],\r\n    \"pageable\": {\r\n        \"pageNumber\": 0,\r\n        \"pageSize\": 10,\r\n        \"sort\": {\r\n            \"empty\": true,\r\n            \"sorted\": false,\r\n            \"unsorted\": true\r\n        },\r\n        \"offset\": 0,\r\n        \"paged\": true,\r\n        \"unpaged\": false\r\n    },\r\n    \"last\": true,\r\n    \"totalElements\": 2,\r\n    \"totalPages\": 1,\r\n    \"size\": 10,\r\n    \"number\": 0,\r\n    \"sort\": {\r\n        \"empty\": true,\r\n        \"sorted\": false,\r\n        \"unsorted\": true\r\n    },\r\n    \"first\": true,\r\n    \"numberOfElements\": 2,\r\n    \"empty\": false\r\n}"
+						}
+					]
+				},
+				{
+					"name": "Search Book By Isbn",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEyNjQ3MSwiZXhwIjoxNzQ3MTMwMDcxfQ.LzX1gwguoDKtI3Tuo7_J-xou2yLcSfo59mGmQq7atmo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/books/search?query=9780316206846&page=0&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"books",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "9780316206846"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Searches books by ISBN number."
+					},
+					"response": [
+						{
+							"name": "Get Book By Isbn",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/books/search?query=9780451524935&page=0&size=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"books",
+										"search"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "9780451524935"
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n    \"content\": [\r\n        {\r\n            \"id\": \"71210dd1-7fa9-4b9c-a60d-908a51d19926\",\r\n            \"title\": \"1984\",\r\n            \"authorName\": \"George Orwell\",\r\n            \"isbn\": \"9780451524935\",\r\n            \"publishedDate\": \"1949-06-08\",\r\n            \"genre\": \"FICTION\",\r\n            \"count\": 3,\r\n            \"pageCount\": 328,\r\n            \"createdAt\": \"2025-05-12T21:25:32.189908\",\r\n            \"updatedAt\": \"2025-05-12T21:25:32.226288\",\r\n            \"available\": false\r\n        }\r\n    ],\r\n    \"pageable\": {\r\n        \"pageNumber\": 0,\r\n        \"pageSize\": 10,\r\n        \"sort\": {\r\n            \"empty\": true,\r\n            \"sorted\": false,\r\n            \"unsorted\": true\r\n        },\r\n        \"offset\": 0,\r\n        \"paged\": true,\r\n        \"unpaged\": false\r\n    },\r\n    \"last\": true,\r\n    \"totalElements\": 1,\r\n    \"totalPages\": 1,\r\n    \"size\": 10,\r\n    \"number\": 0,\r\n    \"sort\": {\r\n        \"empty\": true,\r\n        \"sorted\": false,\r\n        \"unsorted\": true\r\n    },\r\n    \"first\": true,\r\n    \"numberOfElements\": 1,\r\n    \"empty\": false\r\n}"
+						}
+					]
+				},
+				{
+					"name": "Search Book By Author",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEyNjQ3MSwiZXhwIjoxNzQ3MTMwMDcxfQ.LzX1gwguoDKtI3Tuo7_J-xou2yLcSfo59mGmQq7atmo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/books/search?query=Rowling&page=0&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"books",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "Rowling"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Searches books by author name (partial or full match)."
+					},
+					"response": [
+						{
+							"name": "Get Books By Author",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/books/search?query=Orwell&page=0&size=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"books",
+										"search"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "Orwell"
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": "{\r\n    \"content\": [\r\n        {\r\n            \"id\": \"71210dd1-7fa9-4b9c-a60d-908a51d19926\",\r\n            \"title\": \"1984\",\r\n            \"authorName\": \"George Orwell\",\r\n            \"isbn\": \"9780451524935\",\r\n            \"publishedDate\": \"1949-06-08\",\r\n            \"genre\": \"FICTION\",\r\n            \"count\": 3,\r\n            \"pageCount\": 328,\r\n            \"createdAt\": \"2025-05-12T21:25:32.189908\",\r\n            \"updatedAt\": \"2025-05-12T21:25:32.226288\",\r\n            \"available\": false\r\n        },\r\n        {\r\n            \"id\": \"28c52a19-e3f0-40c1-bef5-59d7150ec176\",\r\n            \"title\": \"Animal Farm\",\r\n            \"authorName\": \"George Orwell\",\r\n            \"isbn\": \"9780451526342\",\r\n            \"publishedDate\": \"1945-08-17\",\r\n            \"genre\": \"FICTION\",\r\n            \"count\": 8,\r\n            \"pageCount\": 112,\r\n            \"createdAt\": \"2025-05-12T21:26:10.262639\",\r\n            \"updatedAt\": \"2025-05-12T21:26:10.262639\",\r\n            \"available\": false\r\n        }\r\n    ],\r\n    \"pageable\": {\r\n        \"pageNumber\": 0,\r\n        \"pageSize\": 10,\r\n        \"sort\": {\r\n            \"empty\": true,\r\n            \"sorted\": false,\r\n            \"unsorted\": true\r\n        },\r\n        \"offset\": 0,\r\n        \"paged\": true,\r\n        \"unpaged\": false\r\n    },\r\n    \"last\": true,\r\n    \"totalElements\": 2,\r\n    \"totalPages\": 1,\r\n    \"size\": 10,\r\n    \"number\": 0,\r\n    \"sort\": {\r\n        \"empty\": true,\r\n        \"sorted\": false,\r\n        \"unsorted\": true\r\n    },\r\n    \"first\": true,\r\n    \"numberOfElements\": 2,\r\n    \"empty\": false\r\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Book By ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEzMjIwOSwiZXhwIjoxNzQ3MTM1ODA5fQ.h0l-6ydsYYjYx2WtbsOrIhRs2XIkwL0ObXbr6n7VYzs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/books/32f2df6c-436c-4d27-82a8-568885ab070c",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"books",
+								"32f2df6c-436c-4d27-82a8-568885ab070c"
+							]
+						},
+						"description": "Retrieves detailed information of a book by its unique ID."
+					},
+					"response": [
+						{
+							"name": "Get Book By ID - Not Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/books/28c52a19-e3f0-40c1-bef5-59d7150ec178",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"books",
+										"28c52a19-e3f0-40c1-bef5-59d7150ec178"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": "{\r\n    \"timestamp\": \"2025-05-12T21:51:45.7211868\",\r\n    \"status\": 404,\r\n    \"error\": \"Not Found\",\r\n    \"message\": \"Book not found with id: 28c52a19-e3f0-40c1-bef5-59d7150ec178 not found!\"\r\n}"
+						},
+						{
+							"name": "Get Book By ID - Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/books/28c52a19-e3f0-40c1-bef5-59d7150ec176",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"books",
+										"28c52a19-e3f0-40c1-bef5-59d7150ec176"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": "{\r\n    \"id\": \"28c52a19-e3f0-40c1-bef5-59d7150ec176\",\r\n    \"title\": \"Animal Farm\",\r\n    \"authorName\": \"George Orwell\",\r\n    \"isbn\": \"9780451526342\",\r\n    \"publishedDate\": \"1945-08-17\",\r\n    \"genre\": \"FICTION\",\r\n    \"count\": 8,\r\n    \"pageCount\": 112,\r\n    \"createdAt\": \"2025-05-12T21:26:10.262639\",\r\n    \"updatedAt\": \"2025-05-12T21:26:10.262639\",\r\n    \"available\": false\r\n}"
+						}
+					]
+				}
+			],
+			"description": "Manages all book-related operations including create, update, delete, and search."
+		},
+		{
+			"name": "Borrow",
+			"item": [
+				{
+					"name": "Return Book",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEyODQzNCwiZXhwIjoxNzQ3MTMyMDM0fQ.UEQe-WBvucxiYiVMdYfeQJ3IKoGBZXPwJ0n-e_JG-bM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/borrows/return/e0303ab1-e92c-48ec-a117-615f100af299",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"borrows",
+								"return",
+								"e0303ab1-e92c-48ec-a117-615f100af299"
+							]
+						},
+						"description": "Marks a borrowed book as returned using its borrow ID. Updates return date and user score automatically."
+					},
+					"response": [
+						{
+							"name": "Return Book",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/borrows/return/b755dfba-40bb-4b9d-bf81-4ab4cf67ca72?Content-Type\t=application/json",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"borrows",
+										"return",
+										"b755dfba-40bb-4b9d-bf81-4ab4cf67ca72"
+									],
+									"query": [
+										{
+											"key": "Content-Type\t",
+											"value": "application/json"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": "{\r\n    \"id\": \"b755dfba-40bb-4b9d-bf81-4ab4cf67ca72\",\r\n    \"bookTitle\": \"Animal Farm\",\r\n    \"userFullName\": \"George Harris\",\r\n    \"borrowDate\": \"2025-05-12\",\r\n    \"dueDate\": \"2025-05-14\",\r\n    \"returnDate\": \"2025-05-13\",\r\n    \"returned\": true,\r\n    \"createdAt\": \"2025-05-13T00:05:44.386044\",\r\n    \"updatedAt\": \"2025-05-13T00:05:44.386044\"\r\n}"
+						},
+						{
+							"name": "Already Returned",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/borrows/return/17c2f57e-cbe2-4c13-bae9-b31743cb0470",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"borrows",
+										"return",
+										"17c2f57e-cbe2-4c13-bae9-b31743cb0470"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n    \"timestamp\": \"2025-05-13T13:01:49.985989\",\r\n    \"status\": 400,\r\n    \"error\": \"Bad Request\",\r\n    \"message\": \"Book has already been returned.\"\r\n}"
+						}
+					]
+				},
+				{
+					"name": "Get All Borrows",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEyODQzNCwiZXhwIjoxNzQ3MTMyMDM0fQ.UEQe-WBvucxiYiVMdYfeQJ3IKoGBZXPwJ0n-e_JG-bM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/borrows",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"borrows"
+							]
+						},
+						"description": "Retrieves all borrow records in the system. Can be filtered or paginated depending on implementation."
+					},
+					"response": [
+						{
+							"name": "Get All Borrows",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/borrows?Content-Type\t=application/json",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"borrows"
+									],
+									"query": [
+										{
+											"key": "Content-Type\t",
+											"value": "application/json"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "[\r\n    {\r\n        \"id\": \"17c2f57e-cbe2-4c13-bae9-b31743cb0470\",\r\n        \"bookTitle\": \"1984\",\r\n        \"userFullName\": \"Alice Morgan\",\r\n        \"borrowDate\": \"2025-05-01\",\r\n        \"dueDate\": \"2025-05-04\",\r\n        \"returnDate\": null,\r\n        \"returned\": false,\r\n        \"createdAt\": \"2025-05-12T23:55:22.972373\",\r\n        \"updatedAt\": \"2025-05-12T23:55:22.987995\"\r\n    },\r\n    {\r\n        \"id\": \"7f83be46-979f-4f29-bd30-41951e172317\",\r\n        \"bookTitle\": \"Harry Potter and the Chamber of Secrets\",\r\n        \"userFullName\": \"Alice Morgan\",\r\n        \"borrowDate\": \"2025-04-06\",\r\n        \"dueDate\": \"2025-04-08\",\r\n        \"returnDate\": null,\r\n        \"returned\": false,\r\n        \"createdAt\": \"2025-05-12T23:56:26.216791\",\r\n        \"updatedAt\": \"2025-05-12T23:56:26.216791\"\r\n    },\r\n    {\r\n        \"id\": \"e0303ab1-e92c-48ec-a117-615f100af299\",\r\n        \"bookTitle\": \"Pride and Prejudice\",\r\n        \"userFullName\": \"Deniz Kaya\",\r\n        \"borrowDate\": \"2025-04-07\",\r\n        \"dueDate\": \"2025-04-08\",\r\n        \"returnDate\": null,\r\n        \"returned\": false,\r\n        \"createdAt\": \"2025-05-12T23:56:48.103129\",\r\n        \"updatedAt\": \"2025-05-12T23:56:48.103129\"\r\n    },\r\n    {\r\n        \"id\": \"9c3686d0-f29d-486e-bd4d-b2dfd5ff9410\",\r\n        \"bookTitle\": \"Harry Potter and the Chamber of Secrets\",\r\n        \"userFullName\": \"Deniz Kaya\",\r\n        \"borrowDate\": \"2025-05-07\",\r\n        \"dueDate\": \"2025-05-08\",\r\n        \"returnDate\": null,\r\n        \"returned\": false,\r\n        \"createdAt\": \"2025-05-12T23:57:13.135017\",\r\n        \"updatedAt\": \"2025-05-12T23:57:13.135017\"\r\n    },\r\n    {\r\n        \"id\": \"0702e684-fdc6-4e96-bff8-60f333fea9f5\",\r\n        \"bookTitle\": \"And Then There Were None\",\r\n        \"userFullName\": \"Deniz Kaya\",\r\n        \"borrowDate\": \"2025-03-07\",\r\n        \"dueDate\": \"2025-03-08\",\r\n        \"returnDate\": null,\r\n        \"returned\": false,\r\n        \"createdAt\": \"2025-05-12T23:57:37.133399\",\r\n        \"updatedAt\": \"2025-05-12T23:57:37.134344\"\r\n    },\r\n    {\r\n        \"id\": \"b755dfba-40bb-4b9d-bf81-4ab4cf67ca72\",\r\n        \"bookTitle\": \"Animal Farm\",\r\n        \"userFullName\": \"George Harris\",\r\n        \"borrowDate\": \"2025-05-12\",\r\n        \"dueDate\": \"2025-05-14\",\r\n        \"returnDate\": \"2025-05-13\",\r\n        \"returned\": true,\r\n        \"createdAt\": \"2025-05-13T00:05:44.386044\",\r\n        \"updatedAt\": \"2025-05-13T00:09:01.984380\"\r\n    }\r\n]"
+						}
+					]
+				},
+				{
+					"name": "Get Borrows By User ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEyODQzNCwiZXhwIjoxNzQ3MTMyMDM0fQ.UEQe-WBvucxiYiVMdYfeQJ3IKoGBZXPwJ0n-e_JG-bM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/borrows/user/1469809b-5ced-41b5-9cf0-f02fd8a14320?Content-Type\t=application/json",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"borrows",
+								"user",
+								"1469809b-5ced-41b5-9cf0-f02fd8a14320"
+							],
+							"query": [
+								{
+									"key": "Content-Type\t",
+									"value": "application/json"
+								}
+							]
+						},
+						"description": "Retrieves the full borrowing history of a specific user by user ID."
+					},
+					"response": [
+						{
+							"name": "Get Borrows By User ID",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "GET http://localhost:8080/api/borrows/user/1469809b-5ced-41b5-9cf0-f02fd8a14320?Content-Type\t=application/json",
+									"protocol": "GET http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"borrows",
+										"user",
+										"1469809b-5ced-41b5-9cf0-f02fd8a14320"
+									],
+									"query": [
+										{
+											"key": "Content-Type\t",
+											"value": "application/json"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "[\r\n    {\r\n        \"id\": \"17c2f57e-cbe2-4c13-bae9-b31743cb0470\",\r\n        \"bookTitle\": \"1984\",\r\n        \"userFullName\": \"Alice Morgan\",\r\n        \"borrowDate\": \"2025-05-01\",\r\n        \"dueDate\": \"2025-05-04\",\r\n        \"returnDate\": \"2025-05-13\",\r\n        \"returned\": true,\r\n        \"createdAt\": \"2025-05-12T23:55:22.972373\",\r\n        \"updatedAt\": \"2025-05-13T00:13:36.357475\"\r\n    },\r\n    {\r\n        \"id\": \"7f83be46-979f-4f29-bd30-41951e172317\",\r\n        \"bookTitle\": \"Harry Potter and the Chamber of Secrets\",\r\n        \"userFullName\": \"Alice Morgan\",\r\n        \"borrowDate\": \"2025-04-06\",\r\n        \"dueDate\": \"2025-04-08\",\r\n        \"returnDate\": \"2025-05-13\",\r\n        \"returned\": true,\r\n        \"createdAt\": \"2025-05-12T23:56:26.216791\",\r\n        \"updatedAt\": \"2025-05-13T00:13:57.571522\"\r\n    }\r\n]"
+						}
+					]
+				},
+				{
+					"name": "Get All Borrow Overdues",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEzMjQyNSwiZXhwIjoxNzQ3MTM2MDI1fQ.jcyRjnHMQHLfhSDpLIC-6WPIhcmWmO6tYgYQ3xzb-OU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/borrows/overdue?Content-Type\t=application/json",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"borrows",
+								"overdue"
+							],
+							"query": [
+								{
+									"key": "Content-Type\t",
+									"value": "application/json"
+								}
+							]
+						},
+						"description": "Retrieves all borrow records that are currently overdue (past due date and not returned)."
+					},
+					"response": [
+						{
+							"name": "Get Overdues",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/borrows/overdue?Content-Type\t=application/json",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"borrows",
+										"overdue"
+									],
+									"query": [
+										{
+											"key": "Content-Type\t",
+											"value": "application/json"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "[\r\n    {\r\n        \"id\": \"e0303ab1-e92c-48ec-a117-615f100af299\",\r\n        \"bookTitle\": \"Pride and Prejudice\",\r\n        \"userFullName\": \"Deniz Kaya\",\r\n        \"borrowDate\": \"2025-04-07\",\r\n        \"dueDate\": \"2025-04-08\",\r\n        \"returnDate\": null,\r\n        \"returned\": false,\r\n        \"createdAt\": \"2025-05-12T23:56:48.103129\",\r\n        \"updatedAt\": \"2025-05-12T23:56:48.103129\"\r\n    },\r\n    {\r\n        \"id\": \"9c3686d0-f29d-486e-bd4d-b2dfd5ff9410\",\r\n        \"bookTitle\": \"Harry Potter and the Chamber of Secrets\",\r\n        \"userFullName\": \"Deniz Kaya\",\r\n        \"borrowDate\": \"2025-05-07\",\r\n        \"dueDate\": \"2025-05-08\",\r\n        \"returnDate\": null,\r\n        \"returned\": false,\r\n        \"createdAt\": \"2025-05-12T23:57:13.135017\",\r\n        \"updatedAt\": \"2025-05-12T23:57:13.135017\"\r\n    },\r\n    {\r\n        \"id\": \"0702e684-fdc6-4e96-bff8-60f333fea9f5\",\r\n        \"bookTitle\": \"And Then There Were None\",\r\n        \"userFullName\": \"Deniz Kaya\",\r\n        \"borrowDate\": \"2025-03-07\",\r\n        \"dueDate\": \"2025-03-08\",\r\n        \"returnDate\": null,\r\n        \"returned\": false,\r\n        \"createdAt\": \"2025-05-12T23:57:37.133399\",\r\n        \"updatedAt\": \"2025-05-12T23:57:37.134344\"\r\n    }\r\n]"
+						}
+					]
+				},
+				{
+					"name": "Borrow a Book",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEyODQzNCwiZXhwIjoxNzQ3MTMyMDM0fQ.UEQe-WBvucxiYiVMdYfeQJ3IKoGBZXPwJ0n-e_JG-bM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"bookId\": \"f5430ed4-dc85-4cdc-8ebd-dc50dc5c2cdb\",\r\n  \"email\": \"hande.ozdemir@example.com\",\r\n  \"borrowDate\": \"2025-05-13\",\r\n  \"dueDate\": \"2025-05-15\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/borrows",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"borrows"
+							]
+						},
+						"description": "Creates a new borrow record if the book is available and the user is eligible"
+					},
+					"response": [
+						{
+							"name": "Borrow Book -  Limit Day",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"bookId\": \"4e6a98c2-8fa2-4451-a304-a5c1d0963a7f\",\r\n  \"email\": \"elif.yildiz@example.com\",\r\n  \"borrowDate\": \"2025-05-13\",\r\n  \"dueDate\": \"2025-05-17\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/borrows",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"borrows"
+									]
+								}
+							},
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n    \"timestamp\": \"2025-05-13T13:16:17.8442279\",\r\n    \"status\": 400,\r\n    \"error\": \"Bad Request\",\r\n    \"message\": \"Borrowing this book would exceed your allowed total borrow day limit of 15 days.\"\r\n}"
+						},
+						{
+							"name": "Borrow a Book - Not Available",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"bookId\": \"7379d769-ba02-42a6-a6ed-8f209ed9f96c\",\r\n    \"email\": \"test@user.com\",\r\n    \"borrowDate\": \"2025-05-01\",\r\n    \"dueDate\": \"2025-05-10\"\r\n  }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/borrows",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"borrows"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n    \"timestamp\": \"2025-05-13T13:36:11.9892819\",\r\n    \"status\": 400,\r\n    \"error\": \"Bad Request\",\r\n    \"message\": \"Book is not available for borrowing.\"\r\n}"
+						}
+					]
+				}
+			],
+			"description": "Handles the lifecycle of book borrowing including borrow registration, return, and record retrieval."
+		},
+		{
+			"name": "Statistics",
+			"item": [
+				{
+					"name": "Text-Report",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEyODQzNCwiZXhwIjoxNzQ3MTMyMDM0fQ.UEQe-WBvucxiYiVMdYfeQJ3IKoGBZXPwJ0n-e_JG-bM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/statistics/text-report",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"statistics",
+								"text-report"
+							]
+						},
+						"description": "Returns aggregated statistics for a given user such as reading level, total reading days, score, and return history."
+					},
+					"response": [
+						{
+							"name": "Text-Report",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/statistics/text-report",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"statistics",
+										"text-report"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "LIBRARY STATISTICS REPORT\r\n----------------------------\r\nTotal Books        : 10\r\nAvailable Books    : 54\r\nBorrowed Books     : 3\r\nOverdue Books      : 3\r\nTotal Users        : 8\r\nTotal Borrows      : 6\r\nAvg Return (days)  : 16,67\r\nLast Updated       : 2025-05-13 00:30:49\r\n\r\nTop Genres:\r\n - FICTION (10)\r\n\r\nMost Borrowed Books:\r\n - Harry Potter and the Chamber of Secrets (2)\r\n - Pride and Prejudice (1)\r\n - 1984 (1)\r\n - Animal Farm (1)\r\n - And Then There Were None (1)\r\n"
+						}
+					]
+				},
+				{
+					"name": "Overdue Report",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEzMjQyNSwiZXhwIjoxNzQ3MTM2MDI1fQ.jcyRjnHMQHLfhSDpLIC-6WPIhcmWmO6tYgYQ3xzb-OU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/statistics/overdue",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"statistics",
+								"overdue"
+							]
+						},
+						"description": "Provides overdue borrow statistics including total borrows, overdue count, and ratio."
+					},
+					"response": [
+						{
+							"name": "Overdue - Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/statistics/overdue",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"statistics",
+										"overdue"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n    \"totalBorrows\": 14,\r\n    \"overdueBorrows\": 2,\r\n    \"overdueRatio\": 0.14,\r\n    \"overdueCountByUser\": {\r\n        \"lib2@libris.com\": 1,\r\n        \"george.harris@example.com\": 1\r\n    },\r\n    \"overdueCountByBook\": {\r\n        \"The Casual Vacancy\": 1,\r\n        \"Sapiens\": 1\r\n    },\r\n    \"detailedOverdueEntries\": [\r\n        {\r\n            \"book\": \"The Casual Vacancy\",\r\n            \"dueDate\": \"2025-05-07\",\r\n            \"user\": \"george.harris@example.com\",\r\n            \"borrowDate\": \"2025-05-01\",\r\n            \"daysOverdue\": 6\r\n        },\r\n        {\r\n            \"book\": \"Sapiens\",\r\n            \"dueDate\": \"2025-05-01\",\r\n            \"user\": \"lib2@libris.com\",\r\n            \"borrowDate\": \"2025-04-20\",\r\n            \"daysOverdue\": 12\r\n        }\r\n    ]\r\n}"
+						}
+					]
+				}
+			],
+			"description": "Provides statistical insights into user behavior, reading activity, and performance metrics."
+		},
+		{
+			"name": "Author",
+			"item": [
+				{
+					"name": "Add New Author",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzA3MDM3MiwiZXhwIjoxNzQ3MDczOTcyfQ.7nYDdqvFg2Zwpk5VlWyswwp3Hj93n40AN2uJg2mX4_k",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"name\": \"Jane Austen\" }\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/authors",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"authors"
+							]
+						},
+						"description": "Adds a new author to the system. Requires the author's full name and optional biography or metadata."
+					},
+					"response": [
+						{
+							"name": "Add Author - Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \"name\": \"Arthur Conan Doyle\" }\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/authors",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"authors"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n    \"id\": \"02d7373a-bb24-4673-9203-0803ca12f9e3\",\r\n    \"name\": \"Arthur Conan Doyle\",\r\n    \"books\": []\r\n}"
+						},
+						{
+							"name": "Add New Author - Duplicate Name",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \"name\": \"Jane Austen\" }\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/authors",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"authors"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n    \"timestamp\": \"2025-05-12T20:48:50.8884571\",\r\n    \"status\": 400,\r\n    \"error\": \"Bad Request\",\r\n    \"message\": \"Author with name 'George Orwell' already exists.\"\r\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Author",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/authors",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"authors"
+							]
+						},
+						"description": "Retrieves a list of all authors stored in the system. Useful for linking books to authors."
+					},
+					"response": [
+						{
+							"name": "Get All Authors - Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/authors",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"authors"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "[\r\n    {\r\n        \"id\": \"741eec80-4823-48e8-9d3b-970702a3c579\",\r\n        \"name\": \"George Orwell\",\r\n        \"books\": []\r\n    },\r\n    {\r\n        \"id\": \"677dceb4-5112-4b0d-9c0c-a5ec339e92f4\",\r\n        \"name\": \"J.K. Rowling\",\r\n        \"books\": []\r\n    },\r\n    {\r\n        \"id\": \"8ec3a276-89ec-474c-8346-9b30e18293c7\",\r\n        \"name\": \"Stephen King\",\r\n        \"books\": []\r\n    },\r\n    {\r\n        \"id\": \"690e87fb-4a83-46b5-b98d-d5dad936af1b\",\r\n        \"name\": \"Brandon Sanderson\",\r\n        \"books\": []\r\n    },\r\n    {\r\n        \"id\": \"dd69d72c-eb91-4484-a417-e4ea6ac46def\",\r\n        \"name\": \"Agatha Christie\",\r\n        \"books\": []\r\n    },\r\n    {\r\n        \"id\": \"b4a73bfe-dbc4-4027-ab52-ba0c2146c285\",\r\n        \"name\": \"Jane Austen\",\r\n        \"books\": []\r\n    }\r\n]"
+						}
+					]
+				},
+				{
+					"name": "Delete Author by ID",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/authors/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"authors",
+								""
+							]
+						},
+						"description": "Deletes an author by their unique ID. May be restricted if the author is linked to existing books."
+					},
+					"response": [
+						{
+							"name": "Delete Author by ID",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/authors/690e87fb-4a83-46b5-b98d-d5dad936af1b",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"authors",
+										"690e87fb-4a83-46b5-b98d-d5dad936af1b"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": "{\r\n    \"id\": \"690e87fb-4a83-46b5-b98d-d5dad936af1b\",\r\n    \"name\": \"Brandon Sanderson\",\r\n    \"books\": []\r\n}"
+						},
+						{
+							"name": "Delete Author - Invalid ID",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/authors/690e87fb-4a83-46b5-b98d-d5dad936af10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"authors",
+										"690e87fb-4a83-46b5-b98d-d5dad936af10"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"timestamp\": \"2025-05-12T20:50:00\",\r\n  \"status\": 400,\r\n  \"error\": \"Bad Request\",\r\n  \"message\": \"Author not found with id: invalid-uuid\"\r\n}\r\n"
+						}
+					]
+				},
+				{
+					"name": "Get Author By Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEzMjQyNSwiZXhwIjoxNzQ3MTM2MDI1fQ.jcyRjnHMQHLfhSDpLIC-6WPIhcmWmO6tYgYQ3xzb-OU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/authors/677dceb4-5112-4b0d-9c0c-a5ec339e92f4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"authors",
+								"677dceb4-5112-4b0d-9c0c-a5ec339e92f4"
+							]
+						},
+						"description": "Retrieves the author details by their unique identifier."
+					},
+					"response": [
+						{
+							"name": "Get Author by ID - Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/authors/8ec3a276-89ec-474c-8346-9b30e18293c7",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"authors",
+										"8ec3a276-89ec-474c-8346-9b30e18293c7"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n    \"id\": \"8ec3a276-89ec-474c-8346-9b30e18293c7\",\r\n    \"name\": \"Stephen King\",\r\n    \"books\": []\r\n}"
+						}
+					]
+				}
+			],
+			"description": "Manages book authors in the system including adding, retrieving, and deleting author entries."
+		},
+		{
+			"name": "Reactive",
+			"item": [
+				{
+					"name": "Book Availability",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEzNDE2OSwiZXhwIjoxNzQ3MTM3NzY5fQ.6FSHDHzCwJH_6G5F7XjTDXeZhxrEYol7PjAPj4tSggI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/reactive/books/availability?Accept=text/event-stream",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"reactive",
+								"books",
+								"availability"
+							],
+							"query": [
+								{
+									"key": "Accept",
+									"value": "text/event-stream"
+								}
+							]
+						},
+						"description": "Performs a reactive search for books using a keyword that can match the title, author name, or ISBN. Results are streamed and support pagination via query, page, and size parameters"
+					},
+					"response": [
+						{
+							"name": "Book Availability",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/reactive/books/availability?Accept=text/event-stream",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"reactive",
+										"books",
+										"availability"
+									],
+									"query": [
+										{
+											"key": "Accept",
+											"value": "text/event-stream"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\"bookId\":\"2bfe1528-f5f0-4450-b5a9-b7de8fe2b951\",\"title\":\"Harry Potter and the Chamber of Secrets\",\"available\":true}\r\n00:37:19.598\r\n{\"bookId\":\"71210dd1-7fa9-4b9c-a60d-908a51d19926\",\"title\":\"1984\",\"available\":true}\r\n00:37:19.582\r\n{\"bookId\":\"28c52a19-e3f0-40c1-bef5-59d7150ec176\",\"title\":\"Animal Farm\",\"available\":true}\r\n00:37:19.565\r\n{\"bookId\":\"28c52a19-e3f0-40c1-bef5-59d7150ec176\",\"title\":\"Animal Farm\",\"available\":true}\r\n00:37:19.549\r\n{\"bookId\":\"9cb2c4f4-fd5e-41b6-8bb9-f29dcc3c4004\",\"title\":\"And Then There Were None\",\"available\":true}\r\n00:37:19.534\r\n{\"bookId\":\"2bfe1528-f5f0-4450-b5a9-b7de8fe2b951\",\"title\":\"Harry Potter and the Chamber of Secrets\",\"available\":true}\r\n00:37:19.533\r\n{\"bookId\":\"c4a0e505-edfe-4b18-97c3-0dad8dc9b99b\",\"title\":\"Pride and Prejudice\",\"available\":true}\r\n00:37:19.517\r\n{\"bookId\":\"2bfe1528-f5f0-4450-b5a9-b7de8fe2b951\",\"title\":\"Harry Potter and the Chamber of Secrets\",\"available\":true}\r\n00:37:19.502\r\n"
+						}
+					]
+				},
+				{
+					"name": "Search Book Author",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEzMjQyNSwiZXhwIjoxNzQ3MTM2MDI1fQ.jcyRjnHMQHLfhSDpLIC-6WPIhcmWmO6tYgYQ3xzb-OU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/reactive/books/search?query=Rowling&page=0&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"reactive",
+								"books",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "Rowling"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Reactively searches books by author name and returns matching results via WebFlux"
+					},
+					"response": [
+						{
+							"name": "Book Search Author",
+							"originalRequest": {
+								"method": "GET",
+								"header": []
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Search By Isbn",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEzMjQyNSwiZXhwIjoxNzQ3MTM2MDI1fQ.jcyRjnHMQHLfhSDpLIC-6WPIhcmWmO6tYgYQ3xzb-OU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/reactive/books/search?query=9780316206846&page=0&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"reactive",
+								"books",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "9780316206846"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Reactively searches books by ISBN and returns matching results via WebFlux"
+					},
+					"response": [
+						{
+							"name": "Book Search Isbn",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/reactive/books/search?query=9780451524935&page=0&size=5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"reactive",
+										"books",
+										"search"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "9780451524935"
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "[\r\n    {\r\n        \"id\": \"71210dd1-7fa9-4b9c-a60d-908a51d19926\",\r\n        \"title\": \"1984\",\r\n        \"authorName\": \"George Orwell\",\r\n        \"isbn\": \"9780451524935\",\r\n        \"publishedDate\": \"1949-06-08\",\r\n        \"genre\": \"FICTION\",\r\n        \"count\": 3,\r\n        \"pageCount\": 328,\r\n        \"createdAt\": \"2025-05-12T21:25:32.189908\",\r\n        \"updatedAt\": \"2025-05-13T00:13:36.357475\",\r\n        \"available\": false\r\n    }\r\n]"
+						}
+					]
+				},
+				{
+					"name": "Search By Title",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEzNDE2OSwiZXhwIjoxNzQ3MTM3NzY5fQ.6FSHDHzCwJH_6G5F7XjTDXeZhxrEYol7PjAPj4tSggI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/reactive/books/search?query=Sapiens&page=0&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"reactive",
+								"books",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "Sapiens"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Reactively searches books by title and returns matching results via WebFlux."
+					},
+					"response": [
+						{
+							"name": "Book Title Search",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/api/reactive/books/search?query=Harry&page=0&size=5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"reactive",
+										"books",
+										"search"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "Harry"
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "[\r\n    {\r\n        \"id\": \"32f2df6c-436c-4d27-82a8-568885ab070c\",\r\n        \"title\": \"Harry Potter and the Philosopher's Stone\",\r\n        \"authorName\": \"J.K. Rowling\",\r\n        \"isbn\": \"9780747532699\",\r\n        \"publishedDate\": \"1997-06-26\",\r\n        \"genre\": \"FICTION\",\r\n        \"count\": 15,\r\n        \"pageCount\": 223,\r\n        \"createdAt\": \"2025-05-12T21:26:19.929112\",\r\n        \"updatedAt\": \"2025-05-12T21:26:19.931126\",\r\n        \"available\": false\r\n    },\r\n    {\r\n        \"id\": \"2bfe1528-f5f0-4450-b5a9-b7de8fe2b951\",\r\n        \"title\": \"Harry Potter and the Chamber of Secrets\",\r\n        \"authorName\": \"J.K. Rowling\",\r\n        \"isbn\": \"9780747538493\",\r\n        \"publishedDate\": \"1998-07-02\",\r\n        \"genre\": \"FICTION\",\r\n        \"count\": 3,\r\n        \"pageCount\": 278,\r\n        \"createdAt\": \"2025-05-12T21:26:28.640321\",\r\n        \"updatedAt\": \"2025-05-13T00:13:57.571522\",\r\n        \"available\": false\r\n    }\r\n]"
+						}
+					]
+				},
+				{
+					"name": "Book Search Availability",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEzMjQyNSwiZXhwIjoxNzQ3MTM2MDI1fQ.jcyRjnHMQHLfhSDpLIC-6WPIhcmWmO6tYgYQ3xzb-OU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/reactive/books/search?query=Sapiens&page=0&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"reactive",
+								"books",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "Sapiens"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Streams book availability status changes specifically for search results (SSE)."
+					},
+					"response": []
+				}
+			],
+			"description": "Provides real-time, non-blocking endpoints using Spring WebFlux. Designed for modern client applications requiring live updates and reactive search capabilities."
+		}
+	]
+}
