@@ -2389,43 +2389,127 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzEzMjQyNSwiZXhwIjoxNzQ3MTM2MDI1fQ.jcyRjnHMQHLfhSDpLIC-6WPIhcmWmO6tYgYQ3xzb-OU",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBsaWJyaXMuY29tIiwicm9sZSI6IkxJQlJBUklBTiIsImlhdCI6MTc0NzE1NTc4MSwiZXhwIjoxNzQ3MTU5MzgxfQ.kxvO2KuqU__cRxx0HHnmLOo3nGgSwFz5rd05Jvd4RJw",
 									"type": "string"
 								}
 							]
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/event-stream",
+								"type": "text"
+							}
+						],
 						"url": {
-							"raw": "http://localhost:8080/reactive/books/search?query=Sapiens&page=0&size=10",
+							"raw": "http://localhost:8080/api/reactive/books/availability/stream",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
+								"api",
 								"reactive",
 								"books",
-								"search"
-							],
-							"query": [
-								{
-									"key": "query",
-									"value": "Sapiens"
-								},
-								{
-									"key": "page",
-									"value": "0"
-								},
-								{
-									"key": "size",
-									"value": "10"
-								}
+								"availability",
+								"stream"
 							]
 						},
 						"description": "Streams book availability status changes specifically for search results (SSE)."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Book Search Availability",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "text/event-stream",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/api/reactive/books/availability/stream?Accept=text/event-stream",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"reactive",
+										"books",
+										"availability",
+										"stream"
+									],
+									"query": [
+										{
+											"key": "Accept",
+											"value": "text/event-stream"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/event-stream"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 13 May 2025 17:05:19 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": "data:{\"bookId\":\"32f2df6c-436c-4d27-82a8-568885ab070c\",\"title\":\"Harry Potter and the Philosopher's Stone\",\"available\":false}\n\ndata:{\"bookId\":\"2bfe1528-f5f0-4450-b5a9-b7de8fe2b951\",\"title\":\"Harry Potter and the Chamber of Secrets\",\"available\":false}\n\ndata:{\"bookId\":\"4e6a98c2-8fa2-4451-a304-a5c1d0963a7f\",\"title\":\"Murder on the Orient Express\",\"available\":false}\n\ndata:{\"bookId\":\"8bfc753d-8663-409f-961b-97609020a146\",\"title\":\"A Brief History of Time\",\"available\":false}\n\ndata:{\"bookId\":\"7379d769-ba02-42a6-a6ed-8f209ed9f96c\",\"title\":\"The Stand\",\"available\":false}\n\ndata:{\"bookId\":\"f5430ed4-dc85-4cdc-8ebd-dc50dc5c2cdb\",\"title\":\"The Shining\",\"available\":false}\n\n"
+						}
+					]
 				}
 			],
 			"description": "Provides real-time, non-blocking endpoints using Spring WebFlux. Designed for modern client applications requiring live updates and reactive search capabilities."
