@@ -43,7 +43,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/statistics/**").hasRole("LIBRARIAN")
 
                         .requestMatchers(HttpMethod.GET, "/api/users/{id}", "/api/users/{id}/stats").hasAnyRole("LIBRARIAN", "PATRON")
+                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("LIBRARIAN")
                         .requestMatchers("/api/users/**").hasRole("LIBRARIAN")
+
 
                         .requestMatchers(HttpMethod.GET, "/api/reactive/books/search").permitAll()
                         .requestMatchers("/api/reactive/books/availability").permitAll()
