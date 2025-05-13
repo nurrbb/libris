@@ -132,4 +132,25 @@ class AuthorServiceImplTest {
 
         assertThrows(InvalidRequestException.class, () -> authorService.deleteAuthor(authorId));
     }
+
+    @Test
+    void createAuthor_shouldThrow_whenNameIsBlank() {
+        assertThrows(InvalidRequestException.class, () -> authorService.createAuthor("   "));
+    }
+
+    @Test
+    void createAuthor_shouldThrow_whenNameIsNull() {
+        assertThrows(InvalidRequestException.class, () -> authorService.createAuthor(null));
+    }
+
+    @Test
+    void getAuthorByNameOrCreate_shouldThrow_whenNameIsBlank() {
+        assertThrows(InvalidRequestException.class, () -> authorService.getAuthorByNameOrCreate("   "));
+    }
+
+    @Test
+    void getAuthorByNameOrCreate_shouldThrow_whenNameIsNull() {
+        assertThrows(InvalidRequestException.class, () -> authorService.getAuthorByNameOrCreate(null));
+    }
+
 }
