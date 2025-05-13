@@ -70,7 +70,13 @@ public class BookServiceImpl implements BookService {
     @Cacheable(value = "bookList")
     @Override
     public List<BookResponse> getAllBooks() {
-        return bookRepository.findAll().stream()
+        List<Book> books = bookRepository.findAll();
+
+        if (books.isEmpty()) {
+            log.warn("No books found in the system.");
+        }
+
+        return books.stream()
                 .map(bookMapper::toResponse)
                 .toList();
     }
@@ -84,6 +90,10 @@ public class BookServiceImpl implements BookService {
                 bookRepository.findByAuthor_NameContainingIgnoreCase(query, pageable),
                 bookRepository.findByIsbnContainingIgnoreCase(query, pageable)
         ).flatMap(p -> p.getContent().stream()).distinct().toList();
+
+        if (mergedResults.isEmpty()) {
+            log.info("Search query '{}' returned no results.", query);
+        }
 
         return new PageImpl<>(
                 mergedResults.stream().map(bookMapper::toResponse).toList(),
@@ -100,6 +110,48 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new NotFoundException("Book not found with id: " + id));
 
         Author author = authorService.getAuthorByNameOrCreate(request.getAuthorName());
+
+        boolean isChanged = false;
+
+        if (!existing.getTitle().equals(request.getTitle())) {
+            existing.setTitle(request.getTitle());
+            isChanged = true;
+        }
+
+        if (!existing.getIsbn().equals(request.getIsbn())) {
+            existing.setIsbn(request.getIsbn());
+            isChanged = true;
+        }
+
+        if (!existing.getPublishedDate().equals(request.getPublishedDate())) {
+            existing.setPublishedDate(request.getPublishedDate());
+            isChanged = true;
+        }
+
+        if (!existing.getGenre().equals(request.getGenre())) {
+            existing.setGenre(request.getGenre());
+            isChanged = true;
+        }
+
+        if (!existing.getCount().equals(request.getCount())) {
+            existing.setCount(request.getCount());
+            existing.setAvailable(request.getCount() > 0);
+            isChanged = true;
+        }
+
+        if (!existing.getAuthor().getId().equals(author.getId())) {
+            existing.setAuthor(author);
+            isChanged = true;
+        }
+
+        if (existing.getPageCount() != request.getPageCount()) {
+            existing.setPageCount(request.getPageCount());
+            isChanged = true;
+        }
+
+        if (!isChanged) {
+            throw new InvalidRequestException("No changes detected. Book is already up-to-date.");
+        }
 
         existing.setTitle(request.getTitle());
         existing.setIsbn(request.getIsbn());
