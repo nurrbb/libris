@@ -181,6 +181,16 @@ class BookServiceImplTest {
 
     @Test
     void shouldUpdateBookSuccessfully() {
+
+        Book existingBook = new Book();
+        existingBook.setId(bookId);
+        existingBook.setTitle("Old Title");
+        existingBook.setIsbn("1111111111111");
+        existingBook.setPublishedDate(LocalDate.of(2000, 1, 1));
+        existingBook.setPageCount(100);
+        existingBook.setCount(1);
+        existingBook.setGenre(Genre.FICTION);
+        existingBook.setAuthor(author);
         Book updated = new Book();
         updated.setId(bookId);
         updated.setTitle("Updated Book");
@@ -191,14 +201,31 @@ class BookServiceImplTest {
         updated.setGenre(Genre.SCIENCE);
         updated.setAuthor(author);
 
-        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+        BookRequest bookRequest = new BookRequest(
+                "Updated Book",
+                "Test Author",
+                "9999999999999",
+                LocalDate.now(),
+                Genre.SCIENCE,
+                2,
+                200
+        );
+
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
         when(authorService.getAuthorByNameOrCreate("Test Author")).thenReturn(author);
         when(bookRepository.save(any(Book.class))).thenReturn(updated);
-        when(bookMapper.toResponse(updated)).thenReturn(new BookResponse(bookId, "Updated Book", "Test Author", "9999999999999", LocalDate.now(), Genre.SCIENCE, 2, 200, true, "created", "updated"));
+        when(bookMapper.toResponse(updated)).thenReturn(new BookResponse(
+                bookId, "Updated Book", "Test Author", "9999999999999",
+                LocalDate.now(), Genre.SCIENCE, 2, 200, true, "created", "updated"
+        ));
 
         BookResponse response = bookService.updateBook(bookId, bookRequest);
+
+        assertNotNull(response);
         assertEquals("Updated Book", response.getTitle());
+        verify(bookRepository).save(any(Book.class));
     }
+
 
     @Test
     void shouldThrowNotFoundWhenUpdatingUnknownBook() {
