@@ -125,7 +125,6 @@ class AuthorServiceImplTest {
         assertThrows(InvalidRequestException.class, () -> authorService.deleteAuthor(authorId));
     }
 
-
     @Test
     void deleteAuthor_shouldThrow_whenAuthorNotFound() {
         when(authorRepository.findById(authorId)).thenReturn(Optional.empty());
@@ -152,5 +151,4 @@ class AuthorServiceImplTest {
     void getAuthorByNameOrCreate_shouldThrow_whenNameIsNull() {
         assertThrows(InvalidRequestException.class, () -> authorService.getAuthorByNameOrCreate(null));
     }
-
 }
