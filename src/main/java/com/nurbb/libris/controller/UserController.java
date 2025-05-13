@@ -84,10 +84,10 @@ public class UserController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('LIBRARIAN')")
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'PATRON')")
     @Operation(
             summary = "Get all users",
-            description = "Retrieves a list of all users. Only accessible by librarians.",
+            description = "Retrieves all users if librarian. Patrons only receive their own user data.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Users retrieved successfully",
                             content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))))

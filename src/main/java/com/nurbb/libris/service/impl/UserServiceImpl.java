@@ -104,16 +104,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponse> getAllUsers() {
-        List<User> users = userRepository.findAll();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String currentEmail = auth.getName();
 
-        if (users.isEmpty()) {
-            log.warn("No users found in the system.");
+        boolean isLibrarian = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_LIBRARIAN"));
+
+        if (isLibrarian) {
+            return userRepository.findAll().stream()
+                    .map(userMapper::toResponse)
+                    .toList();
         }
 
-        return users.stream()
+        return userRepository.findByEmail(currentEmail)
                 .map(userMapper::toResponse)
-                .collect(Collectors.toList());
+                .map(List::of)
+                .orElse(List.of());
     }
+
 
     @CacheEvict(value = "userById", key = "#id")
     @Override
@@ -122,25 +130,44 @@ public class UserServiceImpl implements UserService {
         User existing = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
 
-        if (existing.getEmail().equals(request.getEmail()) &&
-                existing.getFullName().equals(request.getFullName()) &&
-                existing.getPhone().equals(request.getPhone()) &&
-                existing.getRole().equals(request.getRole())) {
+        boolean updated = false;
+
+        if (!existing.getFullName().equals(request.getFullName())) {
+            existing.setFullName(request.getFullName());
+            updated = true;
+        }
+
+        if (!existing.getEmail().equals(request.getEmail())) {
+            if (userRepository.existsByEmail(request.getEmail())) {
+                throw new InvalidRequestException("Email already registered by another user.");
+            }
+            existing.setEmail(request.getEmail());
+            updated = true;
+        }
+
+        if (!existing.getPhone().equals(request.getPhone())) {
+            existing.setPhone(request.getPhone());
+            updated = true;
+        }
+
+        if (!existing.getRole().equals(request.getRole())) {
+            existing.setRole(request.getRole());
+            updated = true;
+        }
+
+        if (!passwordEncoder.matches(request.getPassword(), existing.getPassword())) {
+            existing.setPassword(passwordEncoder.encode(request.getPassword()));
+            updated = true;
+        }
+
+        if (!updated) {
             throw new InvalidRequestException("No changes detected. User data is already up-to-date.");
         }
 
-        if (!existing.getEmail().equals(request.getEmail()) &&
-                userRepository.existsByEmail(request.getEmail())) {
-            throw new InvalidRequestException("Email already registered by another user.");
-        }
-
-        existing.setFullName(request.getFullName());
-        existing.setEmail(request.getEmail());
-        existing.setRole(request.getRole());
-        existing.setPhone(request.getPhone());
-        log.info("User with ID '{}' updated. New email: '{}', role: {}", id, request.getEmail(), request.getRole());
+        log.info("User with ID '{}' updated. New email: '{}', role: {}", id, existing.getEmail(), existing.getRole());
         return userMapper.toResponse(userRepository.save(existing));
     }
+
     @Override
     public UserStatisticsResponse getUserStatistics(UUID userId) {
         User user = userRepository.findById(userId)
