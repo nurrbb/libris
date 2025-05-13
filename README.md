@@ -219,38 +219,32 @@ docker-compose up --build
 > ✅ = full access, ❌ = no access
 
 ---
-## 🎥 API Feature Demonstrations
+## 🔐 Authentication
+![Auth](docs/ScreenRecords/Auth.gif)
 
-### 🔐 Authentication
-![Auth](ScreenRecords/Auth.gif)
+## ✍️ Author Management
+![Author CRUD](docs/ScreenRecords/Author_CRUD.gif)
 
-### 👤 User Operations
-![User Operations](ScreenRecords/User_operations.gif)
+## 📚 Book Management
+![Book CRUD](docs/ScreenRecords/Book_CRUD.gif)
 
-### 🗂️ User Management (Admin)
-![User CRUD](ScreenRecords/User_CRUD.gif)
+## 🔁 Borrow & Return
+![Borrow CRUD](docs/ScreenRecords/Borrow_Crud.gif)
 
-### ✍️ Author Management
-![Author CRUD](ScreenRecords/Author_CRUD.gif)
+## 🟣 Reactive Publisher
+![Reactive Publisher](docs/ScreenRecords/Reactive_Publisher.gif)
 
-### 📚 Book Management
-![Book CRUD](ScreenRecords/Book_CRUD.gif)
+## 🔍 Reactive Search
+![Reactive Search](docs/ScreenRecords/Reactive_Search.gif)
 
-### 🔁 Borrow & Return
-![Borrow CRUD](ScreenRecords/Borrow_Crud.gif)
+## 📈 Statistics
+![Stats](docs/ScreenRecords/Stats.gif)
 
-### 📈 Library Statistics
-![Stats](ScreenRecords/Stats.gif)
+## 👤 User CRUD
+![User CRUD](docs/ScreenRecords/User_CRUD.gif)
 
-### 🌐 Reactive Features
-#### 🔎 Reactive Search
-![Reactive Search](ScreenRecords/Reactive_Search.gif)
-
-#### 📡 Availability Publisher (WebFlux SSE)
-![Reactive Publisher](ScreenRecords/Reactive_Publisher.gif)
-
-#### 🔁 Reactive Borrow Flow
-![Reactive Borrow](ScreenRecords/Reactive_Borrow.gif)
+## 👥 User Operations
+![User operations](docs/ScreenRecords/User_operations.gif)
 
 --
 ## 🧪 Test Report
