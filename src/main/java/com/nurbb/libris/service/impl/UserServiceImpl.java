@@ -52,6 +52,10 @@ public class UserServiceImpl implements UserService {
             throw new InvalidRequestException("Email already registered.");
         }
 
+        if (request.getPassword() == null || request.getPassword().isBlank()) {
+            throw new InvalidRequestException("Password cannot be empty.");
+        }
+
         // Determine if user is authenticated (e.g., librarian creating another user)
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAuthenticated = auth != null && auth.isAuthenticated()
@@ -100,8 +104,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponse> getAllUsers() {
-        return userRepository.findAll()
-                .stream()
+        List<User> users = userRepository.findAll();
+
+        if (users.isEmpty()) {
+            log.warn("No users found in the system.");
+        }
+
+        return users.stream()
                 .map(userMapper::toResponse)
                 .collect(Collectors.toList());
     }
@@ -112,6 +121,18 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateUser(UUID id, UserRequest request) {
         User existing = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
+
+        if (existing.getEmail().equals(request.getEmail()) &&
+                existing.getFullName().equals(request.getFullName()) &&
+                existing.getPhone().equals(request.getPhone()) &&
+                existing.getRole().equals(request.getRole())) {
+            throw new InvalidRequestException("No changes detected. User data is already up-to-date.");
+        }
+
+        if (!existing.getEmail().equals(request.getEmail()) &&
+                userRepository.existsByEmail(request.getEmail())) {
+            throw new InvalidRequestException("Email already registered by another user.");
+        }
 
         existing.setFullName(request.getFullName());
         existing.setEmail(request.getEmail());
@@ -165,8 +186,9 @@ public class UserServiceImpl implements UserService {
             throw new InvalidRequestException("This user still has borrowed books. Please return them first.");
         }
 
-        log.info("User with ID '{}' and email '{}' deleted.", user.getId(), user.getEmail());
         userRepository.delete(user);
+        log.info("User with ID '{}' and email '{}' deleted.", user.getId(), user.getEmail());
+
     }
 
     /**
