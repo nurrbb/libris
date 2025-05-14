@@ -161,48 +161,71 @@ docker-compose up --build
 ## 📊 API Endpoints Summary
 
 ### Auth
+| Endpoint         | Method | Roles Allowed | Description                       |
+|------------------|--------|----------------|-----------------------------------|
+| /api/auth/login  | POST   | GUEST          | Authenticate and get JWT token    |
 
-| Method | Endpoint              | Description       |
-|--------|-----------------------|-------------------|
-| POST   | `/api/auth/register`  | User registration |
-| POST   | `/api/auth/login`     | User login        |
+### Author
+
+| Endpoint              | Method | Roles Allowed | Description           |
+|-----------------------|--------|----------------|-----------------------|
+| /api/authors          | POST   | LIBRARIAN      | Add new author        |
+| /api/authors          | GET    | ALL            | Get all authors       |
+| /api/authors/{id}     | GET    | ALL            | Get author by ID      |
+| /api/authors/{id}     | DELETE | LIBRARIAN      | Delete author by ID   |
+
 
 ### Book
+| Endpoint             | Method | Roles Allowed             | Description                  |
+|----------------------|--------|----------------------------|------------------------------|
+| /api/books           | POST   | LIBRARIAN                  | Add a new book               |
+| /api/books           | GET    | GUEST, PATRON, LIBRARIAN   | Retrieve all books           |
+| /api/books/{id}      | GET    | ALL                        | Get book by ID               |
+| /api/books/search    | GET    | ALL                        | Search books by query        |
+| /api/books/{id}      | PUT    | LIBRARIAN                  | Update book                  |
+| /api/books/{id}      | DELETE | LIBRARIAN                  | Delete book                  |
 
-| Method | Endpoint                      | Role          |
-|--------|-------------------------------|---------------|
-| GET    | `/api/books`                  | All           |
-| GET    | `/api/books/{id}`             | All           |
-| POST   | `/api/books`                  | LIBRARIAN,    |
-| PUT    | `/api/books/{id}`             | LIBRARIAN,    |
-| DELETE | `/api/books/{id}`             | LIBRARIAN,    |
-| GET    | `/api/books/reactive/search`  | All (WebFlux) |
 
 ### User
+| Endpoint               | Method | Roles Allowed      | Description                           |
+|------------------------|--------|---------------------|---------------------------------------|
+| /api/users/register    | POST   | GUEST               | Register a new user                   |
+| /api/users/{id}        | GET    | LIBRARIAN, PATRON   | Get user by ID (self if patron)      |
+| /api/users             | GET    | LIBRARIAN, PATRON   | Get all users or self                 |
+| /api/users/{id}        | PUT    | LIBRARIAN           | Update user by ID                     |
+| /api/users/{id}        | DELETE | LIBRARIAN           | Delete user by ID                     |
+| /api/users/{id}/stats  | GET    | LIBRARIAN, PATRON   | Get user reading statistics           |
 
-| Method | Endpoint            | Role           |
-|--------|---------------------|----------------|
-| GET    | `/api/users/{id}`   | SELF, LIBRARIAN |
-| PUT    | `/api/users/{id}`   | SELF, LIBRARIAN |
-| DELETE | `/api/users/{id}`   | LIBRARIAN      |
 
 ### Borrow
-
-| Method | Endpoint                        | Role             |
-|--------|----------------------------------|------------------|
-| POST   | `/api/borrows`                   | USER             |
-| POST   | `/api/borrows/return`            | USER             |
-| GET    | `/api/borrows/history/{email}`   | SELF or LIBRARIAN |
-| GET    | `/api/borrows/overdue`           | LIBRARIAN        |
+| Endpoint                         | Method | Roles Allowed      | Description                    |
+|----------------------------------|--------|---------------------|--------------------------------|
+| /api/borrows                     | POST   | LIBRARIAN           | Borrow a book                  |
+| /api/borrows/return/{borrowId}  | PUT    | LIBRARIAN, PATRON   | Return a book                  |
+| /api/borrows/user/{userId}      | GET    | LIBRARIAN           | User borrow history            |
+| /api/borrows                    | GET    | LIBRARIAN, PATRON   | Get all borrows (or own)       |
+| /api/borrows/overdue           | GET    | LIBRARIAN           | Get overdue borrows            |
 
 ### Statistics
+| Endpoint                     | Method | Roles Allowed | Description                    |
+|------------------------------|--------|----------------|--------------------------------|
+| /api/statistics/text-report | GET    | LIBRARIAN      | Get full statistics as text    |
+| /api/statistics/overdue     | GET    | LIBRARIAN      | Get overdue statistics summary |
 
-| Method | Endpoint                                 | Role       |
-|--------|------------------------------------------|------------|
-| GET    | `/api/statistics/most-borrowed`          | LIBRARIAN  |
-| GET    | `/api/statistics/overdue-ratio`          | LIBRARIAN  |
-| GET    | `/api/statistics/monthly-borrow-counts`  | LIBRARIAN  |
-| GET    | `/api/statistics/average-return-time`    | LIBRARIAN  |
+### Book Availability
+
+| Endpoint                          | Method | Roles Allowed | Description                         |
+|-----------------------------------|--------|----------------|-------------------------------------|
+| /api/reactive/books/availability | GET    | ALL            | Stream book availability (SSE)     |
+
+
+### Book Reactive
+
+| Endpoint                                         | Method | Roles Allowed             | Description                      |
+|--------------------------------------------------|--------|----------------------------|----------------------------------|
+| /api/reactive/books/search                      | GET    | GUEST, PATRON, LIBRARIAN   | Search books reactively          |
+| /api/reactive/books/availability/stream         | GET    | ALL                        | Stream book availability (SSE)   |
+
 
 > See Swagger for full request/response details.
 
